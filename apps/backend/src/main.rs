@@ -52,7 +52,7 @@ async fn handle_root(method: Method, State(state): State<Arc<AppState>>, body: S
 
     format!(
         "Hello request {}! You sent this request with \nHTTP method {} \nHTTP body {}",
-        req_num,
+        req_num + 1,
         method.as_str(),
         body,
     )

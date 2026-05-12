@@ -46,6 +46,7 @@ target
 # Supabase
 .branches
 .temp
+supabase/snippets
 
 # dotenvx
 .env.keys

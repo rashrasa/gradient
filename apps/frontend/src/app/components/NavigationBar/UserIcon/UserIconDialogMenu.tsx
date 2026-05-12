@@ -35,12 +35,7 @@ export default function UserIconDialogMenu({ ref, user, shown = false, x = 0, y 
         (item) =>
             <div
                 onClick={
-                    (ev) => {
-                        if (item.onClick) {
-                            item.onClick(ev);
-                            ;
-                        }
-                    }
+                    item.onClick
                 }
                 className={
                     "hover:bg-sky-50 p-2 select-none w-full text-center "

@@ -15,6 +15,7 @@ export interface UserIconProps {
 }
 
 export default function UserIcon({ className, imageUrl, user, contextMenuEdgePaddingPx = 20 }: UserIconProps) {
+    const imgRef = useRef<HTMLImageElement | null>(null);
     const menuRef = useRef<HTMLDivElement | null>(null);
     const [showDialog, setShowDialog] = useState(false);
     const [lastRightClick, setLastRightClick] = useState({ x: 0, y: 0 });
@@ -34,9 +35,8 @@ export default function UserIcon({ className, imageUrl, user, contextMenuEdgePad
 
     useEffect(() => {
         const handleFocusLoss = (ev: PointerEvent) => {
-            if (menuRef.current && !menuRef.current.contains(ev.target as Node)) {
+            if (imgRef.current && !imgRef.current.contains(ev.target as Node)) {
                 setShowDialog(false);
-
             }
         };
 
@@ -49,9 +49,9 @@ export default function UserIcon({ className, imageUrl, user, contextMenuEdgePad
     return (
         <div>
             <img
+                ref={imgRef}
                 onClick={(ev) => {
                     ev.preventDefault();
-                    ev.stopPropagation()
 
                     const { x, y } = calculateMenuPosition(ev.clientX, ev.clientY);
 

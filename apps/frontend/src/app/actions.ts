@@ -21,3 +21,11 @@ export async function sendRequestToBackend(method: HTTPRequestMethod, body: stri
     }
     return await response.text();
 }
+
+export async function login(email: string, password: string) {
+    return `login called`
+}
+
+export async function signUp(email: string, password: string) {
+    return `signup called`
+}

@@ -1,16 +1,31 @@
 import { Metadata } from "next";
+import LoginForm from "./components/LoginForm";
+import GradientContainer from "../components/common/GradientContainer";
 
 export const metadata: Metadata = { title: "Login" };
 
 export default async function LoginPage() {
     return (
-        <div className="flex flex-col m-20 p-20 bg-sky-200 rounded-xl">
-            <div className="flex flex-col p-20 bg-sky-300 space-y-8">
-                <div className="text-white text-5xl text-center font-mono font-extrabold"
-                >Welcome to Gradient!</div>
-                <div className="text-white text-xl text-center font-mono font-extrabold"
-                >Enter your credentials to continue</div>
-            </div>
-        </div>
+        <GradientContainer
+            z="-30"
+            flexDirection="flex-col"
+            className="mt-20 p-20 w-min mx-auto"
+        >
+            <GradientContainer
+                z="-20"
+                flexDirection="flex-col"
+                className="space-y-8 p-20 w-min mx-auto"
+            >
+                <GradientContainer
+                    z="-10"
+                    flexDirection="flex-col"
+                    className="text-white text-center font-extrabold p-4 w-300 mx-auto space-y-4"
+                >
+                    <p className="text-5xl">Welcome to Gradient!</p>
+                    <p className="text-xl">Enter your credentials to continue</p>
+                </GradientContainer>
+                <LoginForm />
+            </GradientContainer>
+        </GradientContainer>
     )
 };

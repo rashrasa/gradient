@@ -1,68 +1,62 @@
-// not currently in use
+"use client"
 
-import { darker, lighter } from "@/lib/ui";
-import { assert } from "console";
+import { HTMLAttributes } from "react";
 
-export interface GradientContainerProps {
-    children?: any,
-    backgroundLayers?: number,
-    backgroundLayerSpacing?: number,
-    backgroundLayerShadingInverted?: boolean,
-    foregroundColourHex?: string,
+export interface Colour {
+    r: number, g: number, b: number, a: number
 }
 
-/**
- * 
- * @param foregroundColourHex Colours too light or dark may be drowned out.
- */
+export type GradientZIndex = "-50" | "-40" | "-30" | "-20" | "-10" | "0" | "10" | "20" | "30" | "40" | "50" | "disable";
+export type FlexDirection = "flex-col" | "flex-row";
+
+function brightnessFactor(colour: Colour, frac: number): Colour {
+    return {
+        r: colour.r * frac,
+        g: colour.g * frac,
+        b: colour.b * frac,
+        a: colour.a
+    };
+}
+
+
+const zClassScheme: {
+    [K in GradientZIndex]: string
+} = {
+    "50": "bg-sky-1000 text-white",
+    "40": "bg-sky-900 text-white",
+    "30": "bg-sky-800 text-white",
+    "20": "bg-sky-700 text-white",
+    "10": "bg-sky-600 text-white",
+    "0": "bg-sky-500 text-white",
+    "-10": "bg-sky-400 text-sky-500",
+    "-20": "bg-sky-300 text-sky-500",
+    "-30": "bg-sky-200 text-sky-500",
+    "-40": "bg-sky-100 text-sky-500",
+    "-50": "bg-sky-50 text-sky-500",
+    "disable": ""
+}
+
+interface GradientContainerProps extends HTMLAttributes<HTMLDivElement> {
+    z?: GradientZIndex, text?: string, border?: string, layout?: string, flexDirection?: FlexDirection,
+}
+
 export default function GradientContainer({
     children,
-    backgroundLayers = 3,
-    backgroundLayerSpacing = 4,
-    backgroundLayerShadingInverted = false,
-    foregroundColourHex = "#25A7DA" // Sky blue
-}: GradientContainerProps): React.ReactNode {
-    assert(backgroundLayers > 0, "Cannot create a container without at least one layer.");
-
-    for (let i = 0; i < backgroundLayers!; i++) {
-        foregroundColourHex = backgroundLayerShadingInverted ? darker({ hex: foregroundColourHex }) : lighter({ hex: foregroundColourHex });
-    }
-    return GradientContainerRecursive({
-        children,
-        backgroundLayers: backgroundLayers,
-        backgroundLayerSpacing,
-        backgroundLayerShadingInverted,
-        foregroundColourHex,
-    });
-}
-
-function GradientContainerRecursive({
-    children,
-    backgroundLayers,
-    backgroundLayerSpacing,
-    backgroundLayerShadingInverted,
-    foregroundColourHex,
-}: GradientContainerProps): React.ReactNode {
-    if (backgroundLayers == 0) {
-        return children;
-    }
-    else {
-        return (
-            <div
-                className="flex justify-center items-center"
-                style={{
-                    backgroundColor: foregroundColourHex,
-                    padding: backgroundLayerSpacing
-                }}
-            >
-                {GradientContainerRecursive({
-                    children,
-                    backgroundLayers: backgroundLayers! - 1,
-                    backgroundLayerShadingInverted,
-                    backgroundLayerSpacing,
-                    foregroundColourHex: backgroundLayerShadingInverted ? lighter({ hex: foregroundColourHex! }) : darker({ hex: foregroundColourHex! })
-                })}
-            </div>
-        );
-    }
+    className,
+    z = "0",
+    flexDirection = "flex-col",
+    text = "font-mono",
+    border = "rounded-xl",
+    layout = "flex justify-center items-center",
+    ...props
+}: GradientContainerProps) {
+    const zClasses = zClassScheme[z];
+    return (
+        <div
+            className={`${layout} ${flexDirection} ${zClasses} ${className ?? ""} ${text} ${border}`}
+            {...props}
+        >
+            {children}
+        </div>
+    );
 }

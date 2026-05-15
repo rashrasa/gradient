@@ -14,12 +14,10 @@ An online learning platform for math, science, and engineering with collaborativ
 
 1. Install application dependencies:
 
-    - npm: `npm install --prefix ./apps/frontend/`
     - pnpm: `pnpm -C ./apps/frontend/ install`
 
 2. Install dotenv
 
-    - npm: `npm install -g dotenv-cli`
     - pnpm: `pnpm install -g dotenv-cli`
 
 3. Copy .env file: `cp .env.example .env`
@@ -27,7 +25,6 @@ An online learning platform for math, science, and engineering with collaborativ
 4. Start:
 
 - **Frontend**:
-  - npm: `npm run dev --prefix ./apps/frontend/`
   - pnpm: `pnpm -C ./apps/frontend/ run dev`
 
-- **Backend**: `dotenv -e .env -- cargo run backend`
+- **Backend**: `dotenv -e .env -- -- cargo run backend`

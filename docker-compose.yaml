@@ -1,0 +1,17 @@
+services:
+  frontend:
+    build: "apps/frontend"
+    env_file:
+      - ".env"
+    environment:
+      - GRADIENT_BACKEND_SERVER_IP=backend
+      - HOSTNAME=0.0.0.0
+    ports:
+      - "3000:${GRADIENT_FRONTEND_SERVER_PORT}"
+
+  backend:
+    build: "apps/backend"
+    env_file:
+      - ".env"
+    ports:
+      - "8080:${GRADIENT_BACKEND_SERVER_PORT}"

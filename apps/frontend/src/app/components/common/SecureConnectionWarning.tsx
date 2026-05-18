@@ -2,19 +2,31 @@
 
 import { HTMLAttributes, useEffect, useState } from "react";
 
-export interface SecureConnectionWarningProps extends HTMLAttributes<HTMLParagraphElement> { }
+type ConnectionState = "secure" | "dev" | "unsecure";
+type ShowMessage = string | null;
+const defaultConnectionStateMessage: { [K in ConnectionState]: ShowMessage } = {
+    secure: null,
+    dev: "Server is running on the current machine. Connection is secure.",
+    unsecure: "Warning: this connection is unsecure. Anyone can read the network traffic being made to this site. Avoid entering sensitive credentials until this is resolved."
+}
 
-export default function SecureConnectionWarning({ className, ...props }: SecureConnectionWarningProps) {
+export interface SecureConnectionWarningProps extends HTMLAttributes<HTMLParagraphElement> {
+    messageOverrides?: {
+        [K in ConnectionState]: ShowMessage | undefined
+    }
+}
+
+export default function SecureConnectionWarning({ messageOverrides, className, ...props }: SecureConnectionWarningProps) {
     const [message, setMessage] = useState<string | null>(null);
     const [colour, setColour] = useState<string | null>(null);
     useEffect(() => {
         if (window.location.protocol === "https") {
-            setMessage(null);
+            setMessage(messageOverrides?.secure ?? defaultConnectionStateMessage['secure']);
         } else if (window.location.hostname === "localhost") {
-            setMessage("Server is running on the current machine. Connection is secure.");
+            setMessage(messageOverrides?.dev ?? defaultConnectionStateMessage['dev']);
             setColour("bg-blue-400 text-white");
         } else {
-            setMessage("Warning: this connection is unsecure. Anyone can read the network traffic being made to this site. Avoid entering sensitive credentials until this is resolved.");
+            setMessage(messageOverrides?.unsecure ?? defaultConnectionStateMessage['unsecure']);
             setColour("bg-amber-300 text-black")
         }
     });

@@ -1,0 +1,42 @@
+services:
+  frontend-dev:
+    build:
+      dockerfile: apps/frontend/Dockerfile.dev
+    env_file:
+      - ".env.dev"
+    environment:
+      - GRADIENT_BACKEND_SERVER_IP=backend
+      - HOSTNAME=0.0.0.0
+      - WATCHPACK_POLLING=true
+    ports:
+      - "3000:${GRADIENT_FRONTEND_SERVER_PORT}"
+    develop:
+      watch:
+        - action: sync
+          path: apps/frontend
+          target: /app
+          ignore:
+            - node_modules/
+            - .next/
+            - Dockerfile
+        - action: rebuild
+          path: apps/frontend/package.json
+
+  backend-dev:
+    build:
+      dockerfile: apps/backend/Dockerfile.dev
+    env_file:
+      - ".env.dev"
+    ports:
+      - "8080:${GRADIENT_BACKEND_SERVER_PORT}"
+    develop:
+      watch:
+        - action: sync
+          path: apps/backend
+          target: /app
+          ignore:
+            - target/
+            - .next/
+            - Dockerfile
+        - action: rebuild
+          path: apps/frontend/package.json

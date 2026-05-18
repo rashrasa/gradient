@@ -4,13 +4,31 @@ An online learning platform for math, science, and engineering with collaborativ
 
 ## Development
 
-### Dependencies (Docker Development Environment coming soon)
+### Docker Development
+
+1. Ensure Docker and Docker Compose are installed
+
+2. `cp .env.dev.example .env.dev`
+
+3. Start development server `docker compose -f docker-compose.dev.yaml up --watch`
+
+Watch supports:
+
+- frontend-dev
+
+Other services need to be manually restarted with:
+
+`docker compose restart <service-name>`
+
+### Manual Development
+
+#### Dependencies (Docker Development Environment coming soon)
 
 - [Node 20+](https://nodejs.org/en/download)
 - [dotenv-cli](https://www.npmjs.com/package/dotenv-cli)
 - [Rust](https://rust-lang.org/tools/install/)
 
-### Run
+#### Run
 
 1. Install application dependencies:
 
@@ -25,6 +43,6 @@ An online learning platform for math, science, and engineering with collaborativ
 4. Start:
 
 - **Frontend**:
-  - pnpm: `pnpm -C ./apps/frontend/ run dev`
+  - pnpm: `dotenv -e ../../.env -- -- pnpm -C ./apps/frontend/ run dev`
 
 - **Backend**: `dotenv -e .env -- -- cargo run backend`

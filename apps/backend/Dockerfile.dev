@@ -4,6 +4,5 @@ WORKDIR /app
 COPY Cargo.toml .
 COPY Cargo.lock .
 COPY apps/backend apps/backend
-RUN cargo build --release -p backend 
 EXPOSE 8080
-CMD [ "./target/release/backend" ]
+CMD [ "cargo", "run", "-p", "backend" ]

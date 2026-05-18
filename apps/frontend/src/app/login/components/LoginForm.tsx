@@ -46,28 +46,29 @@ export default function LoginForm() {
                 onSubmit={onSubmit}
                 className="flex flex-col items-center space-y-8"
             >
-                <label className="m-2 p-2 select-none">
-                    Email:
-                    <input
-                        className="bg-sky-100 rounded-xl resize-none h-8 w-48"
-                        name="email"
-                        type="email"
-                        inputMode="email"
-                        value={formData.email}
-                        onChange={(ev) => setFormData(prev => ({ ...prev, email: ev.target.value }) as LoginFormData)}
-                    />
-                </label>
-
-                <label className="m-2 p-2 select-none">
-                    Password:
-                    <input
-                        className="bg-sky-100 rounded-xl resize-none h-8 w-48"
-                        name="password"
-                        type="password"
-                        value={formData.password}
-                        onChange={(ev) => setFormData(prev => ({ ...prev, password: ev.target.value }) as LoginFormData)}
-                    />
-                </label>
+                <div className="flex flex-row bg-sky-400 p-8 rounded-xl">
+                    <div className="flex flex-col m-2 p-2 select-none space-y-4 text-white">
+                        <p className="h-8 font-bold flex items-center">Email:</p>
+                        <p className="h-8 font-bold flex items-center">Password:</p>
+                    </div>
+                    <div className="flex flex-col items-start m-2 p-2 select-none space-y-4">
+                        <input
+                            className="bg-sky-100 rounded-xl resize-none h-8 w-120"
+                            name="email"
+                            type="email"
+                            inputMode="email"
+                            value={formData.email}
+                            onChange={(ev) => setFormData(prev => ({ ...prev, email: ev.target.value }) as LoginFormData)}
+                        />
+                        <input
+                            className="bg-sky-100 rounded-xl resize-none h-8 w-120"
+                            name="password"
+                            type="password"
+                            value={formData.password}
+                            onChange={(ev) => setFormData(prev => ({ ...prev, password: ev.target.value }) as LoginFormData)}
+                        />
+                    </div>
+                </div>
 
                 <GradientContainer
                     className="space-x-8 p-2"

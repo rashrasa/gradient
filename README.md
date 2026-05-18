@@ -10,7 +10,7 @@ An online learning platform for math, science, and engineering with collaborativ
 
 2. `cp .env.dev.example .env.dev`
 
-3. Start development server `docker compose -f docker-compose.dev.yaml up --watch`
+3. Start development server `docker compose --env-file .env.dev -f docker-compose.dev.yaml up --watch` (may require elevated permissions)
 
 Watch supports:
 

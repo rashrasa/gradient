@@ -5,16 +5,17 @@ services:
     env_file:
       - ".env.dev"
     environment:
-      - GRADIENT_BACKEND_SERVER_IP=backend
+      - GRADIENT_BACKEND_SERVER_IP=backend-dev
       - HOSTNAME=0.0.0.0
       - WATCHPACK_POLLING=true
+      - POLLING_INTERVAL_MS=1000
     ports:
       - "3000:${GRADIENT_FRONTEND_SERVER_PORT}"
     develop:
       watch:
         - action: sync
           path: apps/frontend
-          target: /app
+          target: /app/apps/frontend
           ignore:
             - node_modules/
             - .next/
@@ -33,10 +34,10 @@ services:
       watch:
         - action: sync
           path: apps/backend
-          target: /app
+          target: /app/apps/backend
           ignore:
             - target/
             - .next/
             - Dockerfile
         - action: rebuild
-          path: apps/frontend/package.json
+          path: apps/backend/Cargo.toml

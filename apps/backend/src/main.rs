@@ -34,7 +34,6 @@ async fn main() {
         .await
         .expect(&format!("Unable to bind to {}:{}", ip, port));
 
-    // NOTE: with_state must come at the end (time spent: 1 hour)
     let router = Router::new()
         .route("/", any(handle_root))
         .with_state(Arc::new(AppState::default()));
@@ -51,9 +50,13 @@ async fn handle_root(method: Method, State(state): State<Arc<AppState>>, body: S
     };
 
     format!(
-        "Hello request {}! You sent this request with \nHTTP method {} \nHTTP body {}",
+        "Hello request {}! You sent this request with \nMethod: {} \nBody: {}",
         req_num + 1,
         method.as_str(),
-        body,
+        if method != Method::GET {
+            body
+        } else {
+            "<Empty body> (method was GET)".into()
+        },
     )
 }

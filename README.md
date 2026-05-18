@@ -18,11 +18,11 @@ Watch supports:
 
 Other services need to be manually restarted with:
 
-`docker compose restart <service-name>`
+`docker compose -f docker-compose.dev.yaml restart <service-name>`
 
-### Manual Development
+### (OLD) Manual Development
 
-#### Dependencies (Docker Development Environment coming soon)
+#### Dependencies
 
 - [Node 20+](https://nodejs.org/en/download)
 - [dotenv-cli](https://www.npmjs.com/package/dotenv-cli)

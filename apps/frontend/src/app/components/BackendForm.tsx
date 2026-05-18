@@ -38,7 +38,7 @@ export default function BackendForm() {
                 </form>
                 <div className=" w-full p-4 space-y-8">
                     <p className="text-center font-mono">Response</p>
-                    <div className="w-full h-84 bg-sky-200 rounded-xl p-4">
+                    <div className="w-full h-84 bg-sky-200 rounded-xl p-4 whitespace-pre-wrap">
                         {response}
                     </div>
                 </div>

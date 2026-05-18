@@ -3,6 +3,8 @@
 use std::{net::Ipv4Addr, str::FromStr, sync::Arc};
 
 use axum::{Router, extract::State, http::Method, routing::any};
+use env_logger::Target;
+use log::{LevelFilter, debug};
 use tokio::sync::Mutex;
 
 #[derive(Clone, Default)]
@@ -17,6 +19,10 @@ struct InnerAppState {
 
 #[tokio::main]
 async fn main() {
+    env_logger::builder()
+        .filter_level(LevelFilter::max())
+        .target(Target::Stdout)
+        .init();
     let ip = Ipv4Addr::from_str(
         &std::env::var("GRADIENT_BACKEND_SERVER_IP")
             .expect("GRADIENT_BACKEND_SERVER_IP not set. Cannot start server."),
@@ -49,7 +55,7 @@ async fn handle_root(method: Method, State(state): State<Arc<AppState>>, body: S
         state.counter - 1
     };
 
-    format!(
+    let response = format!(
         "Hello request {}! You sent this request with \nMethod: {} \nBody: {}",
         req_num + 1,
         method.as_str(),
@@ -58,5 +64,9 @@ async fn handle_root(method: Method, State(state): State<Arc<AppState>>, body: S
         } else {
             "<Empty body> (method was GET)".into()
         },
-    )
+    );
+
+    debug!("{}", response);
+
+    response
 }

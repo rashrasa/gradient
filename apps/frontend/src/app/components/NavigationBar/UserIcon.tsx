@@ -2,15 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import UserIconDialogMenu from "./UserIcon/UserIconDialogMenu";
+import { User } from "@/lib/user";
 
-export interface User {
 
-}
 
 export interface UserIconProps {
     className?: string,
     imageUrl: string,
-    user: User,
+    user?: User,
     contextMenuEdgePaddingPx?: number
 }
 
@@ -69,7 +68,7 @@ export default function UserIcon({ className, imageUrl, user, contextMenuEdgePad
                 className={"w-12 h-12 rounded-full bg-sky-300 hover:cursor-pointer active:brightness-75 " + (className ?? "")}
                 src={imageUrl}
             />
-            <UserIconDialogMenu ref={menuRef} shown={showDialog} x={lastRightClick.x} y={lastRightClick.y} />
+            <UserIconDialogMenu ref={menuRef} user={user} shown={showDialog} x={lastRightClick.x} y={lastRightClick.y} />
         </div>
     );
 }

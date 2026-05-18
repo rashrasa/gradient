@@ -6,7 +6,7 @@ type ConnectionState = "secure" | "dev" | "unsecure";
 type ShowMessage = string | null;
 const defaultConnectionStateMessage: { [K in ConnectionState]: ShowMessage } = {
     secure: null,
-    dev: "Server is running on the current machine. Connection is secure.",
+    dev: "Server is running on the current machine. Connection is secure. Ideally, avoid entering personal credentials since they will be visible on stdout.",
     unsecure: "Warning: this connection is unsecure. Anyone can read the network traffic being made to this site. Avoid entering sensitive credentials until this is resolved."
 }
 

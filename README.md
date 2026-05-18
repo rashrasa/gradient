@@ -8,9 +8,11 @@ An online learning platform for math, science, and engineering with collaborativ
 
 1. Ensure Docker and Docker Compose are installed
 
-2. `cp .env.dev.example .env.dev`
+2. `cp .env.dev.example .env.dev`, fill out any sections marked with "REQUIRED"
 
 3. Start development server `docker compose --env-file .env.dev -f docker-compose.dev.yaml up --watch` (may require elevated permissions)
+
+4. Start a local Supabase server `supabase start -x "vector"`
 
 Watch supports:
 

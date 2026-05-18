@@ -1,7 +1,9 @@
 import { MouseEventHandler, Ref } from "react";
-import { User } from "../UserIcon";
+import { User } from "@/lib/user";
 
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { logOut } from "@/app/actions";
 
 export interface UserIconDialogMenuProps {
     ref?: Ref<HTMLDivElement>,
@@ -21,9 +23,10 @@ export default function UserIconDialogMenu({ ref, user, shown = false, x = 0, y 
     const contextMenuItems: UserIconDialogMenuItem[] = [
         {
             text: (user) ? "Log Out" : "Login",
-            onClick: (ev) => {
+            onClick: async (ev) => {
                 if (user) {
                     // Handle logout
+                    await logOut();
                 } else {
                     router.push("/login");
                 }

@@ -1,5 +1,6 @@
 "use server";
 
+import { createClient } from "@/lib/supabase/server";
 import SecureConnectionWarning from "./common/SecureConnectionWarning";
 import NavigationBarRoute, { NavigationBarRouteProps } from "./NavigationBar/NavigationBarRoute";
 import UserIcon from "./NavigationBar/UserIcon";
@@ -12,6 +13,14 @@ const trailingRouteItems: NavigationBarRouteProps[] = [
 ];
 
 export default async function NavigationBar() {
+    const supabase = await createClient();
+    const { data } = await supabase.auth.getClaims();
+    const user = data?.claims;
+    let email: string | undefined;
+    if (user) {
+        email = user.email!;
+    }
+
     return (
         <div className="flex flex-col top-0 left-0 fixed z-1000">
             <SecureConnectionWarning />
@@ -29,7 +38,7 @@ export default async function NavigationBar() {
                         {...trailingRouteItems.map((props) => <NavigationBarRoute {...props} />)}
                     </div>
                 </div>
-                <UserIcon imageUrl="https://picsum.photos/200" user={{}} />
+                <UserIcon imageUrl="https://picsum.photos/200" user={email ? { email: email } : undefined} />
             </div>
         </div>
 

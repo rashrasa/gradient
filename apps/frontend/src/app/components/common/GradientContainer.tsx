@@ -9,16 +9,6 @@ export interface Colour {
 export type GradientZIndex = "-50" | "-40" | "-30" | "-20" | "-10" | "0" | "10" | "20" | "30" | "40" | "50" | "disable";
 export type FlexDirection = "flex-col" | "flex-row";
 
-function brightnessFactor(colour: Colour, frac: number): Colour {
-    return {
-        r: colour.r * frac,
-        g: colour.g * frac,
-        b: colour.b * frac,
-        a: colour.a
-    };
-}
-
-
 const zClassScheme: {
     [K in GradientZIndex]: string
 } = {

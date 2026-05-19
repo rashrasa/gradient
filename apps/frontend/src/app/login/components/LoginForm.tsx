@@ -40,16 +40,16 @@ export default function LoginForm() {
         switch (formData.mode) {
             case "login":
                 const loginResult = await login(formData.email, formData.password);
-                if (loginResult == 'success') {
-                    setStatusMessage({ severity: "good", message: "Login was successful." });
+                if (loginResult.success) {
+                    setStatusMessage({ severity: "good", message: `Login was successful. You are now logged in as ${loginResult.user.email}` });
                 } else {
                     setStatusMessage({ severity: "error", message: `Login failed. ${loginResult.error.message} Code: ${loginResult.error.code}` });
                 }
                 break;
             case "signUp":
                 const signUpResult = await signUp(formData.email, formData.password);
-                if (signUpResult == 'success') {
-                    setStatusMessage({ severity: "good", message: "Sign up was successful." });
+                if (signUpResult.success) {
+                    setStatusMessage({ severity: "good", message: `Sign up was successful. You are now logged in as ${signUpResult.user.email}` });
                 } else {
                     setStatusMessage({ severity: "error", message: `Sign up failed. ${signUpResult.error.message} Code: ${signUpResult.error.code}` });
                 }

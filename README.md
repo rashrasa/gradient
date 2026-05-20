@@ -24,29 +24,12 @@ Other services need to be manually restarted with:
 
 `docker compose -f docker-compose.dev.yaml restart <service-name>`
 
-### (OLD) Manual Development
+## Preliminary UI Design
 
-#### Dependencies
+![Home Screen](docs/images/Home.jpg)
 
-- [Node 20+](https://nodejs.org/en/download)
-- [dotenv-cli](https://www.npmjs.com/package/dotenv-cli)
-- [Rust](https://rust-lang.org/tools/install/)
+![Dialog Menu](docs/images/DialogMenu.jpg)
 
-#### Run
+![User Profile](docs/images/UserProfile.jpg)
 
-1. Install application dependencies:
-
-    - pnpm: `pnpm -C ./apps/frontend/ install`
-
-2. Install dotenv
-
-    - pnpm: `pnpm install -g dotenv-cli`
-
-3. Copy .env file: `cp .env.example .env`
-
-4. Start:
-
-- **Frontend**:
-  - pnpm: `dotenv -e ../../.env -- -- pnpm -C ./apps/frontend/ run dev`
-
-- **Backend**: `dotenv -e .env -- -- cargo run backend`
+![Login Form](docs/images/LoginForm.jpg)

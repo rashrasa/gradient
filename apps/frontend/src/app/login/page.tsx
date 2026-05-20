@@ -27,7 +27,7 @@ export default async function LoginPage() {
                     className="text-white text-center font-extrabold p-4 w-300 mx-auto space-y-4"
                 >
                     <p className="text-5xl">Welcome to Gradient!</p>
-                    <p className="text-xl">Enter your credentials to continue</p>
+                    {user == null ? <p className="text-xl">Enter your credentials to continue</p> : <></>}
                 </GradientContainer>
                 {user == null ? <LoginForm /> : <UserProfile user={user} imageUrl={userAvatarUrl != null ? userAvatarUrl : undefined} />}
             </GradientContainer>

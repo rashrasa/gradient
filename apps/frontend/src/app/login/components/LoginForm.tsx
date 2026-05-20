@@ -91,11 +91,13 @@ export default function LoginForm() {
                     <GradientContainer
                         className="space-x-8 p-2 justify-evenly"
                         direction="row"
+                        z="-10"
                     >
                         {Object.entries(loginFormMetadataMapping).map(([mode, modeMetadata]) =>
-                            <label key={mode} className="m-2 select-none">
+                            <label key={mode} className="m-2 select-none font-bold text-xl">
                                 <input
                                     key={mode}
+                                    className="mx-2"
                                     name="loginRadio"
                                     type="radio"
                                     value={mode}

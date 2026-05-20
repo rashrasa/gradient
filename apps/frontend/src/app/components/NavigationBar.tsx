@@ -1,9 +1,9 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
 import SecureConnectionWarning from "./common/SecureConnectionWarning";
 import NavigationBarRoute, { NavigationBarRouteProps } from "./NavigationBar/NavigationBarRoute";
 import UserIcon from "./NavigationBar/UserIcon";
+import { fetchCurrentUserProfile, fetchUserAvatar } from "../actions";
 
 const leadingRouteItems: NavigationBarRouteProps[] = [
     { title: "Home", route: "/" },
@@ -13,13 +13,9 @@ const trailingRouteItems: NavigationBarRouteProps[] = [
 ];
 
 export default async function NavigationBar() {
-    const supabase = await createClient();
-    const { data } = await supabase.auth.getClaims();
-    const user = data?.claims;
-    let email: string | undefined;
-    if (user) {
-        email = user.email!;
-    }
+    // Get user here, but not avatar
+    const user = await fetchCurrentUserProfile();
+    const userIconUrl = user ? await fetchUserAvatar(user.id) : undefined;
 
     return (
         <div className="flex flex-col top-0 left-0 fixed z-1000">
@@ -38,9 +34,8 @@ export default async function NavigationBar() {
                         {...trailingRouteItems.map((props) => <NavigationBarRoute {...props} />)}
                     </div>
                 </div>
-                <UserIcon imageUrl="https://picsum.photos/200" user={email ? { email: email } : undefined} />
+                <UserIcon user={user} icon={typeof userIconUrl == "string" ? userIconUrl : "https://placehold.co/400"} />
             </div>
         </div>
-
     );
 }

@@ -6,8 +6,8 @@ export interface Colour {
     r: number, g: number, b: number, a: number
 }
 
-export type GradientZIndex = "-50" | "-40" | "-30" | "-20" | "-10" | "0" | "10" | "20" | "30" | "40" | "50" | "disable";
-export type FlexDirection = "flex-col" | "flex-row";
+export type GradientZIndex = "-50" | "-40" | "-30" | "-20" | "-10" | "0" | "10" | "20" | "30" | "40" | "50" | "none";
+export type FlexDirection = "col" | "row";
 
 const zClassScheme: {
     [K in GradientZIndex]: string
@@ -18,32 +18,32 @@ const zClassScheme: {
     "20": "bg-sky-700 text-white",
     "10": "bg-sky-600 text-white",
     "0": "bg-sky-500 text-white",
-    "-10": "bg-sky-400 text-sky-500",
-    "-20": "bg-sky-300 text-sky-500",
+    "-10": "bg-sky-400 text-white",
+    "-20": "bg-sky-300 text-white",
     "-30": "bg-sky-200 text-sky-500",
     "-40": "bg-sky-100 text-sky-500",
     "-50": "bg-sky-50 text-sky-500",
-    "disable": ""
+    "none": ""
 }
 
 interface GradientContainerProps extends HTMLAttributes<HTMLDivElement> {
-    z?: GradientZIndex, text?: string, border?: string, layout?: string, flexDirection?: FlexDirection,
+    z?: GradientZIndex, text?: string, border?: string, layout?: string, direction?: FlexDirection,
 }
 
 export default function GradientContainer({
     children,
     className,
-    z = "0",
-    flexDirection = "flex-col",
+    z = "-40",
+    direction: flexDirection = "col",
     text = "font-mono",
     border = "rounded-xl",
-    layout = "flex justify-center items-center",
+    layout = "justify-center",
     ...props
 }: GradientContainerProps) {
     const zClasses = zClassScheme[z];
     return (
         <div
-            className={`${layout} ${flexDirection} ${zClasses} ${className ?? ""} ${text} ${border}`}
+            className={`flex flex-${flexDirection} ${layout} ${zClasses} ${className ?? ""} ${text} ${border}`}
             {...props}
         >
             {children}

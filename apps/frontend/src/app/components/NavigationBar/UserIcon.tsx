@@ -1,19 +1,12 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react";
+import { Tables } from "@/lib/supabase/database.types";
 import UserIconDialogMenu from "./UserIcon/UserIconDialogMenu";
-import { User } from "@/lib/user";
+import { MouseEventHandler, useEffect, useRef, useState } from "react";
 
+const contextMenuEdgePaddingPx = 20;
 
-
-export interface UserIconProps {
-    className?: string,
-    imageUrl: string,
-    user?: User,
-    contextMenuEdgePaddingPx?: number
-}
-
-export default function UserIcon({ className, imageUrl, user, contextMenuEdgePaddingPx = 20 }: UserIconProps) {
+export default function UserIcon({ user, icon }: { user: Tables<'users'> | null, icon?: string }) {
     const imgRef = useRef<HTMLImageElement | null>(null);
     const menuRef = useRef<HTMLDivElement | null>(null);
     const [showDialog, setShowDialog] = useState(false);
@@ -32,42 +25,37 @@ export default function UserIcon({ className, imageUrl, user, contextMenuEdgePad
         return { x: menuX, y: menuY }
     };
 
+    const showMenu = (mouseX: number, mouseY: number) => {
+        const { x, y } = calculateMenuPosition(mouseX, mouseY);
+        setShowDialog(true);
+        setLastRightClick({ x, y });
+    }
+
+    const handleFocusLoss = (ev: PointerEvent) => {
+        if (imgRef.current && !imgRef.current.contains(ev.target as Node)) {
+            setShowDialog(false);
+        }
+    };
+
     useEffect(() => {
-        const handleFocusLoss = (ev: PointerEvent) => {
-            if (imgRef.current && !imgRef.current.contains(ev.target as Node)) {
-                setShowDialog(false);
-            }
-        };
-
-
         window.addEventListener('click', handleFocusLoss);
         return () => {
             window.removeEventListener('click', handleFocusLoss);
         }
     });
+
     return (
-        <div>
-            <img
-                ref={imgRef}
-                onClick={(ev) => {
-                    ev.preventDefault();
-
-                    const { x, y } = calculateMenuPosition(ev.clientX, ev.clientY);
-
-                    setShowDialog(true);
-                    setLastRightClick({ x, y });
-                }}
-                onContextMenu={(ev) => {
-                    ev.preventDefault();
-
-                    const { x, y } = calculateMenuPosition(ev.clientX, ev.clientY);
-
-                    setShowDialog(true);
-                    setLastRightClick({ x, y });
-                }}
-                className={"w-12 h-12 rounded-full bg-sky-300 hover:cursor-pointer active:brightness-75 " + (className ?? "")}
-                src={imageUrl}
-            />
+        <div
+            onClick={(ev) => {
+                ev.preventDefault();
+                showMenu(ev.clientX, ev.clientY);
+            }}
+            onContextMenu={(ev) => {
+                ev.preventDefault();
+                showMenu(ev.clientX, ev.clientY);
+            }}
+        >
+            <img ref={imgRef} src={icon} className={"w-12 h-12 rounded-full bg-sky-300 hover:cursor-pointer active:brightness-75 "} />
             <UserIconDialogMenu ref={menuRef} user={user} shown={showDialog} x={lastRightClick.x} y={lastRightClick.y} />
         </div>
     );

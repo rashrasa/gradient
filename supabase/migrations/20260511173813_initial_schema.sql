@@ -14,11 +14,14 @@ CREATE TABLE public.users(
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users can view any profile"
-ON public.users FOR SELECT
-USING ((SELECT auth.uid()) != null);
+ON users FOR SELECT
+TO authenticated
+USING (true);
+
 CREATE POLICY "Users can edit their own profile"
 ON public.users FOR UPDATE
-USING ((SELECT auth.uid()) = id);
+TO authenticated
+USING (auth.uid() = id);
 
 -- Disallow updating specific fields
 CREATE FUNCTION verify_user_update()
@@ -139,4 +142,11 @@ USING (
     bucket_id = 'avatars'
     AND owner_id = (SELECT auth.uid()::text)
     AND (storage.foldername(name))[1] = auth.uid()::text
+);
+
+CREATE POLICY "Users can view any avatar"
+ON storage.objects FOR SELECT
+TO authenticated
+USING (
+    bucket_id = 'avatars'
 );

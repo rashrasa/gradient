@@ -43,7 +43,7 @@ export default function LoginForm() {
                 if (loginResult.success) {
                     setStatusMessage({ severity: "good", message: `Login was successful. You are now logged in as ${loginResult.user.email}` });
                 } else {
-                    setStatusMessage({ severity: "error", message: `Login failed. ${loginResult.error.message} Code: ${loginResult.error.code}` });
+                    setStatusMessage({ severity: "error", message: `Login failed. ${loginResult.error.message}` });
                 }
                 break;
             case "signUp":
@@ -51,7 +51,7 @@ export default function LoginForm() {
                 if (signUpResult.success) {
                     setStatusMessage({ severity: "good", message: `Sign up was successful. You are now logged in as ${signUpResult.user.email}` });
                 } else {
-                    setStatusMessage({ severity: "error", message: `Sign up failed. ${signUpResult.error.message} Code: ${signUpResult.error.code}` });
+                    setStatusMessage({ severity: "error", message: `Sign up failed. ${signUpResult.error.message}` });
                 }
                 break;
         }
@@ -71,7 +71,7 @@ export default function LoginForm() {
                         </div>
                         <div className="flex flex-col items-start m-2 p-2 select-none space-y-4">
                             <input
-                                className="bg-sky-100 rounded-xl resize-none h-8 w-120"
+                                className="bg-sky-100 rounded-xl resize-none h-8 w-120 px-4 text-black"
                                 name="email"
                                 type="email"
                                 inputMode="email"
@@ -79,7 +79,7 @@ export default function LoginForm() {
                                 onChange={(ev) => setFormData(prev => ({ ...prev, email: ev.target.value }) as LoginFormData)}
                             />
                             <input
-                                className="bg-sky-100 rounded-xl resize-none h-8 w-120"
+                                className="bg-sky-100 rounded-xl resize-none h-8 w-120 px-4 text-black"
                                 name="password"
                                 type="password"
                                 value={formData.password}
@@ -90,7 +90,7 @@ export default function LoginForm() {
 
                     <GradientContainer
                         className="space-x-8 p-2 justify-evenly"
-                        flexDirection="flex-row"
+                        direction="row"
                     >
                         {Object.entries(loginFormMetadataMapping).map(([mode, modeMetadata]) =>
                             <label key={mode} className="m-2 select-none">

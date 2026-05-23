@@ -1,0 +1,19 @@
+[package]
+name = "fourier-engine"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.102"
+symphonia = "0.6.0"
+wasm-bindgen = "0.2.121"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dev-dependencies]
+approx = "0.5.1"
+
+[[bin]]
+name = "fft-test"
+path = "bin/fft-test/main.rs"

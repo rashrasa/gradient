@@ -4,9 +4,9 @@ use symphonia::core::{
     io::{MediaSourceStream, ReadOnlySource},
 };
 
-use crate::core::{DigitalSignal, FFTResult};
+use crate::core::{DigitalSignal, FFTResult, FFTValue};
 
-enum State {
+pub enum State {
     Ready,
     SignalLoaded(DigitalSignal, FFTResult),
 }
@@ -35,6 +35,26 @@ impl FourierEngine {
         FourierEngine {
             state: State::Ready,
             configuration: Default::default(),
+        }
+    }
+
+    pub fn state(&self) -> &State {
+        &self.state
+    }
+
+    pub fn get_signal(&self) -> Option<&DigitalSignal> {
+        match &self.state {
+            State::Ready => None,
+            State::SignalLoaded(s, _) => Some(s),
+        }
+    }
+
+    pub fn get_fft_values(&self) -> Option<Vec<FFTValue>> {
+        match &self.state {
+            State::Ready => None,
+            State::SignalLoaded(_, result) => {
+                Some(result.sorted_values().iter().map(|f| *f).collect())
+            }
         }
     }
 
@@ -90,8 +110,8 @@ impl FourierEngine {
             decoded.copy_to_vec_interleaved(&mut samples);
         }
 
-        let signal = DigitalSignal::new(frequency, samples);
-        let fft_result = FFTResult::from_signal(signal.samples());
+        let signal = DigitalSignal::new(frequency as f32, samples);
+        let fft_result = FFTResult::from_signal(&signal);
 
         self.state = State::SignalLoaded(signal, fft_result);
         Ok(())

@@ -5,7 +5,7 @@ mod state;
 mod utils;
 
 pub use complex::*;
-pub use engine::FourierEngine;
+pub use engine::*;
 pub use fourier::*;
-pub use state::DigitalSignal;
+pub use state::*;
 pub use utils::*;

@@ -1,10 +1,14 @@
+use wasm_bindgen::prelude::wasm_bindgen;
+
+#[derive(Clone)]
+#[wasm_bindgen]
 pub struct DigitalSignal {
-    frequency: u32,
+    frequency: f32,
     samples: Vec<f32>,
     // dur = samples.len / frequency
 }
 impl DigitalSignal {
-    pub fn new(frequency: u32, samples: Vec<f32>) -> Self {
+    pub fn new(frequency: f32, samples: Vec<f32>) -> Self {
         DigitalSignal { frequency, samples }
     }
 
@@ -12,7 +16,7 @@ impl DigitalSignal {
         &self.samples
     }
 
-    pub fn frequency(&self) -> u32 {
+    pub fn frequency(&self) -> f32 {
         self.frequency
     }
 }

@@ -1,14 +1,8 @@
 pub mod core;
 
-use core::FourierEngine;
-
-#[cfg(target_arch = "wasm32")]
+use crate::core::{DigitalSignal, FFTValue, FourierEngine, State};
 use anyhow::Context;
-
-#[cfg(target_arch = "wasm32")]
 use std::cell::RefCell;
-
-#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
 #[cfg(target_arch = "wasm32")]
@@ -25,4 +19,33 @@ pub fn load_audio_data(data: &[u8]) -> Result<(), String> {
                 .context("Failed to decode audio file")
         })
         .map_err(|e| format!("{:?}", e))
+}
+
+#[cfg(target_arch = "wasm32")]
+#[wasm_bindgen]
+pub fn get_signal() -> Option<DigitalSignal> {
+    ENGINE.with_borrow(|v| v.get_signal().map(|s| s.clone()))
+}
+
+#[cfg(target_arch = "wasm32")]
+#[wasm_bindgen]
+/// If ReadableState::SignalLoaded, the signal
+/// and fft values can be read.
+pub fn get_state() -> ReadableState {
+    ENGINE.with_borrow(|v| match v.state() {
+        State::Ready => ReadableState::Ready,
+        State::SignalLoaded(_, _) => ReadableState::SignalLoaded,
+    })
+}
+
+#[cfg(target_arch = "wasm32")]
+#[wasm_bindgen]
+pub fn get_sorted_fft_values() -> Option<Vec<FFTValue>> {
+    ENGINE.with_borrow(|v| v.get_fft_values())
+}
+
+#[wasm_bindgen]
+pub enum ReadableState {
+    Ready,
+    SignalLoaded,
 }

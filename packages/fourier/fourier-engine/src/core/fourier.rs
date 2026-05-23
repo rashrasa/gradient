@@ -1,25 +1,63 @@
 use std::f32::consts::PI;
 
-use crate::core::ComplexFloat;
+use wasm_bindgen::prelude::wasm_bindgen;
+
+use crate::core::{ComplexFloat, DigitalSignal};
+
+#[wasm_bindgen]
+#[derive(Clone, Copy, Debug)]
+pub struct FFTValue {
+    frequency: f32,
+    result: ComplexFloat,
+}
+
+impl FFTValue {
+    pub fn new(f: f32, z: ComplexFloat) -> Self {
+        Self {
+            frequency: f,
+            result: z,
+        }
+    }
+    pub fn frequency(&self) -> f32 {
+        self.frequency
+    }
+    pub fn result(&self) -> ComplexFloat {
+        self.result
+    }
+}
 
 pub struct FFTResult {
-    values: Vec<ComplexFloat>,
+    sorted_values: Vec<FFTValue>,
 }
 
 impl FFTResult {
-    pub fn from_signal(samples: &[f32]) -> Self {
-        let samples = samples.to_vec();
-        let values = fft_recursive(
+    pub fn from_signal(signal: &DigitalSignal) -> Self {
+        let samples = signal.samples().to_vec();
+        let sampling_frequency = signal.frequency();
+
+        let fft = fft_recursive(
             &samples
                 .iter()
                 .map(|s| ComplexFloat::standard(*s, 0.0))
                 .collect::<Vec<ComplexFloat>>(),
         );
-        FFTResult { values }
+
+        let mut sorted_values: Vec<FFTValue> = fft
+            .iter()
+            .enumerate()
+            .map(|(i, z)| FFTValue {
+                frequency: i as f32 * sampling_frequency / fft.len() as f32,
+                result: *z,
+            })
+            .collect();
+
+        sorted_values.sort_by(|a, b| a.result.r().total_cmp(&b.result.r()));
+
+        FFTResult { sorted_values }
     }
 
-    pub fn values(&self) -> &[ComplexFloat] {
-        &self.values
+    pub fn sorted_values(&self) -> &[FFTValue] {
+        &self.sorted_values
     }
 }
 

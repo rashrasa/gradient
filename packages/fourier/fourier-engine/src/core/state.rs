@@ -1,7 +1,3 @@
-use wasm_bindgen::prelude::wasm_bindgen;
-
-#[derive(Clone)]
-#[wasm_bindgen]
 pub struct DigitalSignal {
     frequency: f32,
     samples: Vec<f32>,

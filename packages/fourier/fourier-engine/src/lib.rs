@@ -1,13 +1,34 @@
 pub mod core;
 
-use crate::core::{DigitalSignal, FFTValue, FourierEngine, State};
+use crate::core::FourierEngine;
 use anyhow::Context;
 use std::cell::RefCell;
 use wasm_bindgen::prelude::*;
 
+// Export core types if not on WASM
+#[cfg(not(target_arch = "wasm32"))]
+pub use core;
+
+#[cfg(target_arch = "wasm32")]
+mod wasm;
+#[cfg(target_arch = "wasm32")]
+pub use wasm::*;
+
+#[cfg(target_arch = "wasm32")]
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
+}
+
 #[cfg(target_arch = "wasm32")]
 thread_local! {
     pub static ENGINE: RefCell<FourierEngine> = RefCell::new(FourierEngine::new());
+}
+
+#[wasm_bindgen(start)]
+fn run() {
+    log("Hello from WASM");
 }
 
 #[cfg(target_arch = "wasm32")]
@@ -24,7 +45,7 @@ pub fn load_audio_data(data: &[u8]) -> Result<(), String> {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 pub fn get_signal() -> Option<DigitalSignal> {
-    ENGINE.with_borrow(|v| v.get_signal().map(|s| s.clone()))
+    ENGINE.with_borrow(|v| v.signal().map(|s| s.clone().into()))
 }
 
 #[cfg(target_arch = "wasm32")]
@@ -32,20 +53,19 @@ pub fn get_signal() -> Option<DigitalSignal> {
 /// If ReadableState::SignalLoaded, the signal
 /// and fft values can be read.
 pub fn get_state() -> ReadableState {
-    ENGINE.with_borrow(|v| match v.state() {
-        State::Ready => ReadableState::Ready,
-        State::SignalLoaded(_, _) => ReadableState::SignalLoaded,
-    })
+    ENGINE.with_borrow(|v| v.state().into())
 }
 
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
-pub fn get_sorted_fft_values() -> Option<Vec<FFTValue>> {
-    ENGINE.with_borrow(|v| v.get_fft_values())
-}
-
-#[wasm_bindgen]
-pub enum ReadableState {
-    Ready,
-    SignalLoaded,
+pub fn get_sorted_fft_result() -> Option<Vec<FFTValue>> {
+    ENGINE.with_borrow(|v| {
+        v.fft_result().map(|result| {
+            result
+                .sorted_values()
+                .iter()
+                .map(|value| value.into())
+                .collect()
+        })
+    })
 }

@@ -1,10 +1,6 @@
+use crate::core::{ComplexFloat, DigitalSignal};
 use std::f32::consts::PI;
 
-use wasm_bindgen::prelude::wasm_bindgen;
-
-use crate::core::{ComplexFloat, DigitalSignal};
-
-#[wasm_bindgen]
 #[derive(Clone, Copy, Debug)]
 pub struct FFTValue {
     frequency: f32,

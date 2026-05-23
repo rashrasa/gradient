@@ -5,7 +5,9 @@ const nextConfig: NextConfig = {
 
   watchOptions: process.env.POLL_INTERVAL_MS ? {
     pollIntervalMs: parseInt(process.env.POLL_INTERVAL_MS)
-  } : undefined
+  } : undefined,
+
+  output: "standalone"
 };
 
 export default nextConfig;

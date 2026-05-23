@@ -42,19 +42,17 @@ impl FourierEngine {
         &self.state
     }
 
-    pub fn get_signal(&self) -> Option<&DigitalSignal> {
+    pub fn signal(&self) -> Option<&DigitalSignal> {
         match &self.state {
             State::Ready => None,
             State::SignalLoaded(s, _) => Some(s),
         }
     }
 
-    pub fn get_fft_values(&self) -> Option<Vec<FFTValue>> {
+    pub fn fft_result(&self) -> Option<&FFTResult> {
         match &self.state {
             State::Ready => None,
-            State::SignalLoaded(_, result) => {
-                Some(result.sorted_values().iter().map(|f| *f).collect())
-            }
+            State::SignalLoaded(_, result) => Some(result),
         }
     }
 

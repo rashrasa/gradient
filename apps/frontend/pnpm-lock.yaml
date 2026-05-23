@@ -26,6 +26,9 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.105.4
         version: 2.105.4
+      fourier-engine:
+        specifier: workspace:1.0.0
+        version: link:packages/fourier-engine
       next:
         specifier: 16.2.6
         version: 16.2.6(@babel/core@7.29.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -63,6 +66,8 @@ importers:
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
+
+  packages/fourier-engine: {}
 
 packages:
 

@@ -3,11 +3,8 @@ use std::{
     ops::{Add, Mul, Neg, Sub},
 };
 
-use wasm_bindgen::prelude::wasm_bindgen;
-
 /// z = r*e^(i*theta)
 #[derive(Clone, Copy, Debug)]
-#[wasm_bindgen]
 pub struct ComplexFloat {
     r: f32,
     theta: f32,

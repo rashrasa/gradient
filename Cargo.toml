@@ -1,3 +1,7 @@
+# Any changes to the [members] has to be reflected in:
+#   - the root Dockerfile and Dockerfile.dev files
+#   - docker/*.Cargo.toml
+
 [workspace]
 resolver = "3"
 members = ["apps/backend", "packages/fourier/fourier-engine"]

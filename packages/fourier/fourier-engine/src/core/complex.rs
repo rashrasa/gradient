@@ -1,54 +1,69 @@
 use std::{
     fmt::Display,
-    ops::{Add, Mul, Sub},
+    ops::{Add, Mul, Neg, Sub},
 };
 
 /// z = a + bi
 #[derive(Clone, Copy, Debug)]
 pub struct ComplexFloat {
-    a: f32,
-    b: f32,
+    r: f32,
+    theta: f32,
 }
 
 impl ComplexFloat {
     pub fn standard(a: f32, b: f32) -> Self {
-        ComplexFloat { a, b }
+        ComplexFloat {
+            r: (a * a + b * b).sqrt(),
+            theta: b.atan2(a),
+        }
     }
     pub fn polar(r: f32, theta: f32) -> Self {
-        ComplexFloat {
-            a: r * theta.cos(),
-            b: r * theta.sin(),
-        }
+        ComplexFloat { r, theta }
     }
 
     pub fn a(&self) -> f32 {
-        self.a
+        self.r * self.theta.cos()
     }
 
     pub fn b(&self) -> f32 {
-        self.b
+        self.r * self.theta.sin()
+    }
+
+    pub fn a_b(&self) -> (f32, f32) {
+        let (sin, cos) = self.theta.sin_cos();
+        (self.r * cos, self.r * sin)
     }
 
     pub fn r(&self) -> f32 {
-        (self.a * self.a + self.b * self.b).sqrt()
+        self.r
     }
     pub fn theta(&self) -> f32 {
-        self.b.atan2(self.a)
+        self.theta
     }
 }
 
 impl Display for ComplexFloat {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} + {}i", self.a, self.b)
+        write!(f, "{}e^(i{})", self.r, self.theta)
     }
 }
 
 impl Add for ComplexFloat {
     type Output = Self;
     fn add(self, rhs: Self) -> Self::Output {
+        let (l_a, l_b) = self.a_b();
+        let (r_a, r_b) = rhs.a_b();
+
+        ComplexFloat::standard(l_a + r_a, l_b + r_b)
+    }
+}
+
+impl Neg for ComplexFloat {
+    type Output = Self;
+    fn neg(self) -> Self::Output {
         ComplexFloat {
-            a: self.a + rhs.a,
-            b: self.b + rhs.b,
+            r: -self.r,
+            theta: self.theta,
         }
     }
 }
@@ -56,10 +71,7 @@ impl Add for ComplexFloat {
 impl Sub for ComplexFloat {
     type Output = Self;
     fn sub(self, rhs: Self) -> Self::Output {
-        ComplexFloat {
-            a: self.a - rhs.a,
-            b: self.b - rhs.b,
-        }
+        self + -rhs
     }
 }
 
@@ -67,8 +79,8 @@ impl Mul for ComplexFloat {
     type Output = Self;
     fn mul(self, rhs: Self) -> Self::Output {
         ComplexFloat {
-            a: self.a * rhs.a - self.b * rhs.b,
-            b: self.b * rhs.a + self.a * rhs.b,
+            r: self.r * rhs.r,
+            theta: self.theta + rhs.theta,
         }
     }
 }
@@ -76,20 +88,15 @@ impl Mul for ComplexFloat {
 impl Add<f32> for ComplexFloat {
     type Output = Self;
     fn add(self, rhs: f32) -> Self::Output {
-        ComplexFloat {
-            a: self.a + rhs,
-            b: self.b,
-        }
+        let (a, b) = self.a_b();
+        ComplexFloat::standard(a + rhs, b)
     }
 }
 
 impl Sub<f32> for ComplexFloat {
     type Output = Self;
     fn sub(self, rhs: f32) -> Self::Output {
-        ComplexFloat {
-            a: self.a - rhs,
-            b: self.b,
-        }
+        self + -rhs
     }
 }
 
@@ -97,8 +104,8 @@ impl Mul<f32> for ComplexFloat {
     type Output = ComplexFloat;
     fn mul(self, rhs: f32) -> Self::Output {
         ComplexFloat {
-            a: self.a * rhs,
-            b: self.b * rhs,
+            r: self.r * rhs,
+            theta: self.theta,
         }
     }
 }

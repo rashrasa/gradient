@@ -1,8 +1,0 @@
-FROM ghcr.io/pnpm/pnpm:latest
-RUN pnpm runtime set node 26 -g 
-WORKDIR /app
-COPY apps/frontend apps/frontend
-RUN pnpm install --frozen-lockfile -C apps/frontend
-ENV WATCHPACK_POLLING=true
-EXPOSE 3000
-CMD [ "pnpm", "run", "-C", "apps/frontend", "dev" ]

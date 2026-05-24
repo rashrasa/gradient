@@ -22,6 +22,7 @@ impl FFTValue {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct FFTResult {
     sorted_values: Vec<FFTValue>,
 }

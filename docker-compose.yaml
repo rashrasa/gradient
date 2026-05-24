@@ -1,7 +1,8 @@
 services:
-  frontend:
+  frontend-prod:
     build: 
-      dockerfile: "apps/frontend/Dockerfile"
+      dockerfile: "Dockerfile"
+      target: gradient-frontend-prod
     env_file:
       - ".env"
     environment:
@@ -10,9 +11,10 @@ services:
     ports:
       - "3000:${GRADIENT_FRONTEND_SERVER_PORT}"
 
-  backend:
+  backend-prod:
     build:
-      dockerfile: "apps/backend/Dockerfile"
+      dockerfile: "Dockerfile"
+      target: gradient-backend-prod
     env_file:
       - ".env"
     ports:

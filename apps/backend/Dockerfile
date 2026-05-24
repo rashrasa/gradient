@@ -1,9 +1,0 @@
-FROM rust:1.95
-# Assumes context is at the project level
-WORKDIR /app
-COPY Cargo.toml .
-COPY Cargo.lock .
-COPY apps/backend apps/backend
-RUN cargo build --release -p backend 
-EXPOSE 8080
-CMD [ "./target/release/backend" ]

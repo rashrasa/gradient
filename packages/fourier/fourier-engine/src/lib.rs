@@ -1,23 +1,18 @@
 pub mod core;
 
-use crate::core::FourierEngine;
-use anyhow::Context;
-use std::cell::RefCell;
-use wasm_bindgen::prelude::*;
-
-// Export core types if not on WASM
 #[cfg(not(target_arch = "wasm32"))]
-pub use core;
+pub use core::*;
+#[cfg(target_arch = "wasm32")]
+use {anyhow::Context, core::FourierEngine, std::cell::RefCell, wasm::*, wasm_bindgen::prelude::*};
 
 #[cfg(target_arch = "wasm32")]
 mod wasm;
-#[cfg(target_arch = "wasm32")]
-pub use wasm::*;
 
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace = console)]
+    #[cfg(target_arch = "wasm32")]
     fn log(s: &str);
 }
 
@@ -26,8 +21,10 @@ thread_local! {
     pub static ENGINE: RefCell<FourierEngine> = RefCell::new(FourierEngine::new());
 }
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(start)]
 fn run() {
+    #[cfg(target_arch = "wasm32")]
     log("Hello from WASM");
 }
 
@@ -45,7 +42,7 @@ pub fn load_audio_data(data: &[u8]) -> Result<(), String> {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 pub fn get_signal() -> Option<DigitalSignal> {
-    ENGINE.with_borrow(|v| v.signal().map(|s| s.clone().into()))
+    ENGINE.with_borrow(|v| v.signal().map(|s| s.into()))
 }
 
 #[cfg(target_arch = "wasm32")]

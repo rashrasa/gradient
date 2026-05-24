@@ -1,3 +1,13 @@
 **/node_modules
 **/target
 **/.env*
+**/pkg
+**/.next
+**/.git
+.vscode
+supabase
+build.py
+docker-compose.dev.yaml
+docker-compose.yaml
+**/*.md
+docs

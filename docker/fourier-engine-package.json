@@ -1,0 +1,17 @@
+{
+  "name": "fourier-engine",
+  "type": "module",
+  "version": "0.1.0",
+  "files": [
+    "fourier_engine_bg.wasm",
+    "fourier_engine.js",
+    "fourier_engine_bg.js",
+    "fourier_engine.d.ts"
+  ],
+  "main": "fourier_engine.js",
+  "types": "fourier_engine.d.ts",
+  "sideEffects": [
+    "./fourier_engine.js",
+    "./snippets/*"
+  ]
+}

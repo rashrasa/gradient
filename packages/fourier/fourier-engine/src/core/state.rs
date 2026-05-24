@@ -1,3 +1,4 @@
+#[derive(Debug, Clone)]
 pub struct DigitalSignal {
     frequency: f32,
     samples: Vec<f32>,

@@ -15,6 +15,7 @@ struct AppState {
 #[derive(Default)]
 struct InnerAppState {
     counter: u64,
+    engine: fourier_engine::FourierEngine,
 }
 
 #[tokio::main]
@@ -49,14 +50,14 @@ async fn main() {
 
 #[axum_macros::debug_handler]
 async fn handle_root(method: Method, State(state): State<Arc<AppState>>, body: String) -> String {
-    let req_num = {
+    let (req_num, state) = {
         let mut state = state.inner.lock().await;
         state.counter += 1;
-        state.counter - 1
+        (state.counter - 1, state.engine.state().clone())
     };
 
     let response = format!(
-        "Hello request {}! You sent this request with \nMethod: {} \nBody: {}",
+        "Hello request {}! You sent this request with \nMethod: {} \nBody: {}\nFourier Engine State: {:?}",
         req_num + 1,
         method.as_str(),
         if method != Method::GET {
@@ -64,6 +65,7 @@ async fn handle_root(method: Method, State(state): State<Arc<AppState>>, body: S
         } else {
             "<Empty body> (method was GET)".into()
         },
+        state
     );
 
     debug!("{}", response);

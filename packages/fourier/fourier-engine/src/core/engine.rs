@@ -6,11 +6,19 @@ use symphonia::core::{
 
 use crate::core::{DigitalSignal, FFTResult, FFTValue};
 
+#[derive(Debug, Clone)]
 pub enum State {
     Ready,
     SignalLoaded(DigitalSignal, FFTResult),
 }
 
+impl Default for State {
+    fn default() -> Self {
+        Self::Ready
+    }
+}
+
+#[derive(Debug)]
 struct Configuration {}
 
 impl Default for Configuration {
@@ -25,6 +33,7 @@ impl Default for Configuration {
 //  playback info (audio cursors)
 //  inputs (set-point for number of summed waves)
 //  reconstructed audio from inputs and setpoint
+#[derive(Default, Debug)]
 pub struct FourierEngine {
     state: State,
     configuration: Configuration,
@@ -33,8 +42,7 @@ pub struct FourierEngine {
 impl FourierEngine {
     pub fn new() -> Self {
         FourierEngine {
-            state: State::Ready,
-            configuration: Default::default(),
+            ..Default::default()
         }
     }
 

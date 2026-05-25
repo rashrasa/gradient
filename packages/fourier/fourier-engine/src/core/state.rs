@@ -6,7 +6,10 @@ pub struct DigitalSignal {
 }
 impl DigitalSignal {
     pub fn new(frequency: f32, samples: Vec<f32>) -> Self {
-        DigitalSignal { frequency, samples }
+        DigitalSignal {
+            frequency,
+            samples: samples,
+        }
     }
 
     pub fn samples(&self) -> &[f32] {

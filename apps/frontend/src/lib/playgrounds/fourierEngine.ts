@@ -36,10 +36,24 @@ export class FourierEngineRenderer {
             case ReadableState.SignalLoaded:
                 ctx.fillText("Signal Loaded", width / 2 - 60, height * 0.2 + 30)
                 ctx.font = '12px monospace'
-                ctx.fillText(`Extracted ${get_sorted_fft_result()!.length} frequencies`, width / 2 - 80, height * 0.2 + 60)
+                ctx.fillText(`Extracted ${get_sorted_fft_result()!.length} frequencies`, width / 2 - 80, height * 0.2 + 50)
+                let results = get_sorted_fft_result()!;
+                ctx.font = '12px monospace'
+                ctx.fillText(`Highest Amp Results`, width / 2 - 120, height * 0.2 + 70)
+
+                ctx.fillText(`Freq: ${results[0].frequency}`, width / 2 - 120, height * 0.2 + 100)
+                ctx.fillText(`Phase ${results[0].phase}`, width / 2 - 120, height * 0.2 + 112)
+                ctx.fillText(`Amplitude ${results[0].amplitude}`, width / 2 - 120, height * 0.2 + 124)
+
+                ctx.fillText(`Freq: ${results[1].frequency}`, width / 2 - 120, height * 0.2 + 148)
+                ctx.fillText(`Phase ${results[1].phase}`, width / 2 - 120, height * 0.2 + 160)
+                ctx.fillText(`Amplitude ${results[1].amplitude}`, width / 2 - 120, height * 0.2 + 172)
+
+                ctx.fillText(`Freq: ${results[2].frequency}`, width / 2 - 120, height * 0.2 + 196)
+                ctx.fillText(`Phase ${results[2].phase}`, width / 2 - 120, height * 0.2 + 208)
+                ctx.fillText(`Amplitude ${results[2].amplitude}`, width / 2 - 120, height * 0.2 + 220)
                 break;
         }
-        ctx.rect(width / 2 - 25, height / 2 - 25, 50, 50);
         ctx.fill()
     }
 

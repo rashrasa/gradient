@@ -1,6 +1,6 @@
 use std::{
     fmt::Display,
-    ops::{Add, Mul, Neg, Sub},
+    ops::{Add, Div, Mul, Neg, Sub},
 };
 
 /// z = r*e^(i*theta)
@@ -105,6 +105,16 @@ impl Mul<f32> for ComplexFloat {
     fn mul(self, rhs: f32) -> Self::Output {
         ComplexFloat {
             r: self.r * rhs,
+            theta: self.theta,
+        }
+    }
+}
+
+impl Div<f32> for ComplexFloat {
+    type Output = ComplexFloat;
+    fn div(self, rhs: f32) -> Self::Output {
+        ComplexFloat {
+            r: self.r / rhs,
             theta: self.theta,
         }
     }

@@ -24,22 +24,38 @@ impl FFTValue {
 
 #[derive(Debug, Clone)]
 pub struct FFTResult {
+    original_frequency: f32,
+    original_sample_count: usize,
+
+    padded_sample_count: usize,
+
+    values: Vec<FFTValue>,
     sorted_values: Vec<FFTValue>,
+
+    reconstructed: Vec<f32>,
 }
 
 impl FFTResult {
     pub fn from_signal(signal: &DigitalSignal) -> Self {
-        let samples = signal.samples().to_vec();
         let sampling_frequency = signal.frequency();
 
-        let fft = fft_recursive(
-            &samples
-                .iter()
-                .map(|s| ComplexFloat::standard(*s, 0.0))
-                .collect::<Vec<ComplexFloat>>(),
-        );
+        let mut samples = signal
+            .samples()
+            .iter()
+            .map(|s| ComplexFloat::standard(*s, 0.0))
+            .collect::<Vec<ComplexFloat>>();
+        let original_sample_count = samples.len();
+        if !samples.len().is_power_of_two() {
+            samples.resize(
+                samples.len().next_power_of_two(),
+                ComplexFloat::polar(0.0, 0.0),
+            );
+        }
+        let padded_sample_count = samples.len();
 
-        let mut sorted_values: Vec<FFTValue> = fft
+        let fft = fft_recursive(&samples);
+
+        let values: Vec<FFTValue> = fft
             .iter()
             .enumerate()
             .map(|(i, z)| FFTValue {
@@ -48,17 +64,52 @@ impl FFTResult {
             })
             .collect();
 
-        sorted_values.sort_by(|a, b| a.result.r().total_cmp(&b.result.r()));
+        let mut sorted_values: Vec<FFTValue> = values
+            .iter()
+            .take((fft.len() as f32 / 2.0 + 1.0) as usize)
+            .map(|v| *v)
+            .collect();
 
-        FFTResult { sorted_values }
+        sorted_values.sort_by(|a, b| b.result.r().total_cmp(&a.result.r()));
+
+        let fft_values: Vec<ComplexFloat> = values.iter().map(|v| v.result).collect();
+        let reconstructed = inverse_fft(&fft_values, padded_sample_count)
+            .iter()
+            .map(|v| v.a())
+            .take(original_sample_count)
+            .collect();
+
+        FFTResult {
+            original_frequency: signal.frequency(),
+            original_sample_count,
+            padded_sample_count,
+            values,
+            sorted_values,
+            reconstructed,
+        }
+    }
+    pub fn original_frequency(&self) -> f32 {
+        self.original_frequency
+    }
+
+    pub fn original_sample_count(&self) -> usize {
+        self.original_sample_count
+    }
+    pub fn unsorted_values(&self) -> &[FFTValue] {
+        &self.values
     }
 
     pub fn sorted_values(&self) -> &[FFTValue] {
         &self.sorted_values
     }
+
+    pub fn reconstructed(&self) -> &[f32] {
+        &self.reconstructed
+    }
 }
 
 fn fft_recursive(samples: &[ComplexFloat]) -> Vec<ComplexFloat> {
+    assert!(samples.len().is_power_of_two());
     let n = samples.len();
     if n <= 1 {
         return samples.to_vec();
@@ -85,4 +136,100 @@ fn fft_recursive(samples: &[ComplexFloat]) -> Vec<ComplexFloat> {
     }
 
     bins
+}
+
+fn inverse_fft(values: &[ComplexFloat], sample_count: usize) -> Vec<ComplexFloat> {
+    let conjugate_values: Vec<ComplexFloat> = values
+        .iter()
+        .map(|v| {
+            // Calculate Conjugate
+            ComplexFloat::standard(v.a(), -v.b())
+        })
+        .collect();
+
+    let result: Vec<ComplexFloat> = fft_recursive(&conjugate_values)
+        .iter()
+        .map(|v| ComplexFloat::standard(v.a(), -v.b()) / sample_count as f32)
+        .collect();
+
+    result
+}
+
+#[cfg(test)]
+mod tests {
+    use approx::assert_relative_eq;
+
+    use crate::core::Function;
+
+    use super::*;
+
+    #[test]
+    fn inverse_fft_recovers_signal() {
+        let frequency: f32 = 200.0;
+        let function = Function::new(|x| 3.0 * (3.0 * x).sin() + 9.0 * (PI / 4.0 * x).sin());
+        let mut samples = function.sample(0.0, 5.0, frequency);
+        if !samples.len().is_power_of_two() {
+            samples.resize(samples.len().next_power_of_two(), 0.0);
+        }
+        let sample_count = samples.len();
+
+        let samples_complex = samples
+            .iter()
+            .map(|v| ComplexFloat::standard(*v, 0.0))
+            .collect::<Vec<ComplexFloat>>();
+
+        let fft_values: Vec<ComplexFloat> = fft_recursive(&samples_complex);
+
+        let expected: Vec<ComplexFloat> = samples_complex;
+        let actual = inverse_fft(&fft_values, sample_count);
+
+        for i in 0..sample_count {
+            assert_relative_eq!(expected[i].a(), actual[i].a(), epsilon = 1.0e-4);
+        }
+    }
+
+    #[test]
+    fn inverse_fft_calculates_correct_result() {
+        let frequency: f32 = 200.0;
+        let function = Function::new(|x| 3.0 * (3.0 * x).sin() + 9.0 * (PI / 4.0 * x).sin());
+        let mut samples = function.sample(0.0, 5.0, frequency);
+        if !samples.len().is_power_of_two() {
+            samples.resize(samples.len().next_power_of_two(), 0.0);
+        }
+        let sample_count = samples.len();
+        let fft_values: Vec<ComplexFloat> = fft_recursive(
+            &samples
+                .iter()
+                .map(|v| ComplexFloat::standard(*v, 0.0))
+                .collect::<Vec<ComplexFloat>>(),
+        );
+
+        let ifft_values = inverse_fft(&fft_values, sample_count);
+        let mut planner = rustfft::FftPlanner::new();
+        let ifft = planner.plan_fft_inverse(sample_count);
+
+        let mut expected: Vec<rustfft::num_complex::Complex<f32>> = fft_values
+            .iter()
+            .map(|z| rustfft::num_complex::Complex {
+                re: z.a(),
+                im: z.b(),
+            })
+            .collect();
+
+        ifft.process(&mut expected);
+        let actual = ifft_values;
+
+        for i in 0..sample_count {
+            assert_relative_eq!(
+                expected[i].re / sample_count as f32,
+                actual[i].a(),
+                epsilon = 1.0e-4
+            );
+            assert_relative_eq!(
+                expected[i].im / sample_count as f32,
+                actual[i].b(),
+                epsilon = 1.0e-4
+            );
+        }
+    }
 }

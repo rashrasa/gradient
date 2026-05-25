@@ -1,10 +1,13 @@
+use std::ops::Index;
+
 use anyhow::Context;
 use symphonia::core::{
+    audio::Audio,
     formats::{TrackType, probe::Hint},
     io::{MediaSourceStream, ReadOnlySource},
 };
 
-use crate::core::{DigitalSignal, FFTResult, FFTValue};
+use crate::core::{DigitalSignal, FFTResult};
 
 #[derive(Debug, Clone)]
 pub enum State {
@@ -97,11 +100,12 @@ impl FourierEngine {
             .sample_rate
             .context("Failed to read sampling rate of track")?;
 
+        println!("Track Frequency: {}", frequency);
+
         let track_id = track.id;
-
-        let mut samples: Vec<f32> = vec![];
-
+        let mut sample_sets: Vec<Vec<f32>> = vec![];
         loop {
+            let mut decoded_sets: Vec<Vec<f32>> = vec![];
             let packet = match format
                 .next_packet()
                 .context("Failed to read audio stream")?
@@ -117,7 +121,28 @@ impl FourierEngine {
                 continue;
             }
             let decoded = decoder.decode(&packet).context("Failed to decode packet")?;
-            decoded.copy_to_vec_interleaved(&mut samples);
+
+            decoded.copy_to_vecs_planar(&mut decoded_sets);
+            while sample_sets.len() < decoded_sets.len() {
+                sample_sets.push(vec![]);
+            }
+
+            for i in 0..decoded_sets.len() {
+                sample_sets[i].extend(&decoded_sets[i]);
+            }
+        }
+
+        let mut samples = vec![];
+
+        let n_samples = sample_sets[0].len();
+        let n_sets = sample_sets.len();
+        println!("samples: {} sets: {}", n_samples, n_sets);
+        for i in 0..n_samples {
+            let mut sample = 0.0;
+            for sample_set in sample_sets.iter() {
+                sample += sample_set[i];
+            }
+            samples.push(sample / n_sets as f32);
         }
 
         let signal = DigitalSignal::new(frequency as f32, samples);

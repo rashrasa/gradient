@@ -64,6 +64,10 @@ impl FourierEngine {
         }
     }
 
+    pub fn unload(&mut self) {
+        self.state = State::Ready;
+    }
+
     pub fn load_audio_data(&mut self, data: &[u8]) -> anyhow::Result<()> {
         let src = ReadOnlySource::new(data);
         let mss = MediaSourceStream::new(Box::new(src), Default::default());

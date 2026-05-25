@@ -1,22 +1,21 @@
 "use server"
 
-import { Tables } from "@/lib/supabase/database.types";
 import GradientContainer from "../common/GradientContainer";
-import { fetchCategories } from "@/app/actions";
 import CategoryDisplay from "./CategoryDisplay";
+import { Category, PLAYGROUNDS, Subject, SubjectDescriptor } from "@/lib/playgrounds/playground";
 
 
-export default async function SubjectDisplay({ subject }: { subject: Tables<'subjects'> }) {
-    const { data, error } = await fetchCategories(subject.subject_number);
+export default async function SubjectDisplay({ number }: { number: Subject }) {
+    const subject = PLAYGROUNDS.subjects[number];
 
     return (
         <GradientContainer direction="col" className="py-16 px-8">
-            <p className="font-extrabold w-full text-8xl">{subject.display_title}</p>
+            <p className="font-extrabold w-full text-8xl">{subject.title}</p>
             {subject.description ? <p>{subject.description}</p> : <></>}
 
             <GradientContainer className="pt-4">
-                {error != undefined ? <p>Failed to fetch categories</p> : data.map(
-                    (category) => <CategoryDisplay key={category.category_number} category={category} />
+                {Object.entries(PLAYGROUNDS.categories).filter((v) => v[1].subject == number).map(
+                    ([number, category]) => <CategoryDisplay key={number} number={number as Category} />
                 )}
             </GradientContainer>
         </GradientContainer>

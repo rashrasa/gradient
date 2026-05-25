@@ -21,7 +21,7 @@ export default async function NavigationBar() {
         <div className="flex flex-col top-0 left-0 fixed z-1000">
             <SecureConnectionWarning />
 
-            <div className="flex flex-row items-center justify-between w-screen h-20  p-8 bg-sky-300 space-x-8">
+            <div className="flex flex-row items-center justify-between w-screen h-20 p-8 bg-sky-300 space-x-8">
                 <div className="flex flex-row w-full justify-between">
                     <div
                         className="flex flex-row space-x-8 float-left"

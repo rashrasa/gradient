@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 anyhow = "1.0.102"
-symphonia = "0.6.0"
+symphonia = { version = "0.6", features = ["all-codecs"] }
 wasm-bindgen = "0.2.121"
 
 [lib]
@@ -17,3 +17,7 @@ approx = "0.5.1"
 [[bin]]
 name = "fft-test"
 path = "bin/fft-test/main.rs"
+
+[[example]]
+name = "example-1"
+path = "examples/example_1.rs"

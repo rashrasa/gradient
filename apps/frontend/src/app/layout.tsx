@@ -23,12 +23,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col pt-20">
+      <body className="min-h-full flex flex-col mt-28">
         <NavigationBar />
         {children}
       </body>

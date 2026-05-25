@@ -29,13 +29,19 @@ fn run() {
 
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
+pub fn unload() {
+    ENGINE.with_borrow_mut(|v| v.unload())
+}
+
+#[cfg(target_arch = "wasm32")]
+#[wasm_bindgen]
 pub fn load_audio_data(data: &[u8]) -> Result<(), String> {
     ENGINE
         .with_borrow_mut(|v| {
             v.load_audio_data(data)
                 .context("Failed to decode audio file")
         })
-        .map_err(|e| format!("{:?}", e))
+        .map_err(|e| format!("Fourier Engine (WASM) Error: {:?}", e))
 }
 
 #[cfg(target_arch = "wasm32")]

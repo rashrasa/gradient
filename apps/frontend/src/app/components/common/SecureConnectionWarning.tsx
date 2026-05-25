@@ -37,7 +37,7 @@ export default function SecureConnectionWarning({ messageOverrides, className, .
                 (message == null)
                     ? <></>
                     : <p
-                        className={`select-none font-mono font-bold shadow-xl box-border border border-black z-20 text-sm pl-8 p-1 ${className ?? ""} ${colour}`} {...props}
+                        className={`select-none font-mono font-bold shadow-xl box-border border border-black z-20 text-sm pl-8 p-1 h-8 ${className ?? ""} ${colour}`} {...props}
                     >{message}</p>
             }
         </>

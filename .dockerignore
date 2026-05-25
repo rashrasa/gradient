@@ -11,3 +11,4 @@ docker-compose.dev.yaml
 docker-compose.yaml
 **/*.md
 docs
+**/bin

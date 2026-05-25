@@ -24,8 +24,7 @@ thread_local! {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(start)]
 fn run() {
-    #[cfg(target_arch = "wasm32")]
-    log("Hello from WASM");
+    log("Hello from hot-recompiled WASM");
 }
 
 #[cfg(target_arch = "wasm32")]

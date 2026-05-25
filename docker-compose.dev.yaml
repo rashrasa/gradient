@@ -17,12 +17,10 @@ services:
         - action: sync
           path: apps/frontend
           target: /app/apps/frontend
-          ignore:
-            - node_modules/
-            - .next/
-            - Dockerfile
         - action: rebuild
           path: apps/frontend/package.json
+        - action: rebuild
+          path: packages/fourier/fourier-engine
 
   backend-dev:
     build:

@@ -1,7 +1,10 @@
 use std::io::Write;
 
 use anyhow::Context;
-use fourier_engine::core::{DigitalSignal, FFTResult, Function};
+use fourier_engine::{
+    FFTValue,
+    core::{DigitalSignal, FFTResult, Function},
+};
 
 fn main() -> anyhow::Result<()> {
     let freq = 240.0;
@@ -10,7 +13,10 @@ fn main() -> anyhow::Result<()> {
 
     let samples = Function::new(|x| (x * 3.0).sin() + (x * 2.0).cos()).sample(0.0, dur, freq);
     let signal = DigitalSignal::new(freq, samples);
-    let fft = FFTResult::from_signal(&signal).sorted_values().to_vec();
+    let fft: Vec<FFTValue> = FFTResult::from_signal(&signal)
+        .sorted_values()
+        .map(|v| *v)
+        .collect();
 
     std::fs::create_dir_all("packages/fourier/fourier-engine/bin/fft-test/result").unwrap();
 

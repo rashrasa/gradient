@@ -1,4 +1,7 @@
-use crate::core::{ComplexFloat, DigitalSignal};
+use crate::{
+    MaxVec, Original, Sorted,
+    core::{ComplexFloat, DigitalSignal},
+};
 use std::f32::consts::PI;
 
 #[derive(Clone, Copy, Debug)]
@@ -27,10 +30,7 @@ pub struct FFTResult {
     original_frequency: f32,
     original_sample_count: usize,
 
-    padded_sample_count: usize,
-
-    values: Vec<FFTValue>,
-    sorted_values: Vec<FFTValue>,
+    values: MaxVec<FFTValue>,
 
     reconstructed: Vec<f32>,
 }
@@ -64,15 +64,15 @@ impl FFTResult {
             })
             .collect();
 
-        let mut sorted_values: Vec<FFTValue> = values
+        let values: Vec<FFTValue> = values
             .iter()
             .take((fft.len() as f32 / 2.0 + 1.0) as usize)
             .map(|v| *v)
             .collect();
 
-        sorted_values.sort_by(|a, b| b.result.r().total_cmp(&a.result.r()));
+        let values = MaxVec::new(values, |a, b| b.result.r().total_cmp(&a.result.r()));
 
-        let fft_values: Vec<ComplexFloat> = values.iter().map(|v| v.result).collect();
+        let fft_values: Vec<ComplexFloat> = values.original().map(|v| v.result).collect();
         let reconstructed = inverse_fft(&fft_values, padded_sample_count)
             .iter()
             .map(|v| v.a())
@@ -82,9 +82,7 @@ impl FFTResult {
         FFTResult {
             original_frequency: signal.frequency(),
             original_sample_count,
-            padded_sample_count,
             values,
-            sorted_values,
             reconstructed,
         }
     }
@@ -95,12 +93,12 @@ impl FFTResult {
     pub fn original_sample_count(&self) -> usize {
         self.original_sample_count
     }
-    pub fn unsorted_values(&self) -> &[FFTValue] {
-        &self.values
+    pub fn unsorted_values(&self) -> Original<'_, FFTValue> {
+        self.values.original()
     }
 
-    pub fn sorted_values(&self) -> &[FFTValue] {
-        &self.sorted_values
+    pub fn sorted_values(&self) -> Sorted<'_, FFTValue> {
+        self.values.sorted()
     }
 
     pub fn reconstructed(&self) -> &[f32] {

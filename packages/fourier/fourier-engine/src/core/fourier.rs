@@ -1,7 +1,4 @@
-use crate::{
-    MaxVec, Original, Sorted,
-    core::{ComplexFloat, DigitalSignal},
-};
+use crate::core::{ComplexFloat, DigitalSignal, MaxVec, Original, Sorted};
 use std::f32::consts::PI;
 
 #[derive(Clone, Copy, Debug)]
@@ -44,10 +41,11 @@ impl FFTResult {
             .iter()
             .map(|s| ComplexFloat::standard(*s, 0.0))
             .collect::<Vec<ComplexFloat>>();
+
         let original_sample_count = samples.len();
         if !samples.len().is_power_of_two() {
             samples.resize(
-                samples.len().next_power_of_two(),
+                original_sample_count.next_power_of_two(),
                 ComplexFloat::polar(0.0, 0.0),
             );
         }
@@ -58,22 +56,16 @@ impl FFTResult {
         let values: Vec<FFTValue> = fft
             .iter()
             .enumerate()
+            .take((fft.len() as f32 / 2.0 + 1.0) as usize)
             .map(|(i, z)| FFTValue {
                 frequency: i as f32 * sampling_frequency / fft.len() as f32,
                 result: *z,
             })
             .collect();
 
-        let values: Vec<FFTValue> = values
-            .iter()
-            .take((fft.len() as f32 / 2.0 + 1.0) as usize)
-            .map(|v| *v)
-            .collect();
-
         let values = MaxVec::new(values, |a, b| b.result.r().total_cmp(&a.result.r()));
 
-        let fft_values: Vec<ComplexFloat> = values.original().map(|v| v.result).collect();
-        let reconstructed = inverse_fft(&fft_values, padded_sample_count)
+        let reconstructed = inverse_fft(&fft, padded_sample_count)
             .iter()
             .map(|v| v.a())
             .take(original_sample_count)

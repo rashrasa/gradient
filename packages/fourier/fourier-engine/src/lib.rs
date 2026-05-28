@@ -24,7 +24,7 @@ thread_local! {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(start)]
 fn run() {
-    log("Hello from hot-recompiled WASM");
+    console_error_panic_hook::set_once();
 }
 
 #[cfg(target_arch = "wasm32")]
@@ -62,12 +62,16 @@ pub fn get_state() -> ReadableState {
 #[wasm_bindgen]
 pub fn get_sorted_fft_result() -> Option<Vec<FFTValue>> {
     ENGINE.with_borrow(|v| {
-        v.fft_result().map(|result| {
-            result
-                .sorted_values()
-                .iter()
-                .map(|value| value.into())
-                .collect()
-        })
+        v.fft_result()
+            .map(|result| result.sorted_values().map(|value| value.into()).collect())
+    })
+}
+
+#[cfg(target_arch = "wasm32")]
+#[wasm_bindgen]
+pub fn get_fft_result() -> Option<Vec<FFTValue>> {
+    ENGINE.with_borrow(|v| {
+        v.fft_result()
+            .map(|result| result.unsorted_values().map(|value| value.into()).collect())
     })
 }

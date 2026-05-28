@@ -1,8 +1,5 @@
-use std::ops::Index;
-
 use anyhow::Context;
 use symphonia::core::{
-    audio::Audio,
     formats::{TrackType, probe::Hint},
     io::{MediaSourceStream, ReadOnlySource},
 };

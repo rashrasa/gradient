@@ -1,10 +1,7 @@
 use std::io::Write;
 
 use anyhow::Context;
-use fourier_engine::{
-    FFTValue,
-    core::{DigitalSignal, FFTResult, Function},
-};
+use fourier_engine::core::{DigitalSignal, FFTResult, FFTValue, Function};
 
 fn main() -> anyhow::Result<()> {
     let freq = 240.0;

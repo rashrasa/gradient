@@ -4,27 +4,26 @@ import GradientContainer from "@/app/components/common/GradientContainer"
 import { useEffect, useRef, useState } from "react";
 import { FourierEngineRenderer, FourierEngineRendererState } from "@/lib/playgrounds/fourierEngine";
 import { Coordinates, Mafs, Plot, Point } from "mafs";
-import { FFTValue, ReadableState } from "fourier-engine";
+import { DigitalSignal, FFTValue, ReadableState, Point2F, SignalLoadedAdditional } from "fourier-engine";
+import { record } from "@/lib/debug/profile";
 
 let renderer: FourierEngineRenderer | undefined;
 
 export default function FourierPlayground() {
+    let stop = record("Computing page")
     useEffect(() => {
         renderer = new FourierEngineRenderer();
-        return () => { renderer?.dispose() }
+        window.addEventListener("resize", (_) => { onResize() });
+        return () => {
+            renderer?.dispose()
+            window.removeEventListener("resize", (_) => { onResize() })
+        }
     }, [])
-
     const uploadAudioRef = useRef<HTMLInputElement>(null);
     const [loadedFile, setLoadedFile] = useState<string | null>(null);
     const [height, setHeight] = useState(600);
     const [rendererState, setRendererState] = useState<FourierEngineRendererState>({ inner: ReadableState.Ready });
     const onResize = () => setHeight(window.innerHeight * 0.8)
-
-    useEffect(() => {
-        onResize()
-        window.addEventListener("resize", (_) => { onResize() });
-        return () => { window.removeEventListener("resize", (_) => { onResize() }) }
-    })
 
     let graph1: Graph | undefined;
     let graph2: Graph | undefined;
@@ -53,15 +52,39 @@ export default function FourierPlayground() {
                     ],
                 });
                 graph2 = createSampledGraph({
-                    samples: [...rendererState.decodedSignal.amplitudes()].map(
-                        (y, i) => { return { x: i * 1.0 / rendererState.decodedSignal.frequency, y: y } }
-                    )
+                    samples: rendererState.decodedSignal.samples(),
+                    additional: rendererState.additional,
                 })
                 break;
         }
     }
 
+    const graphNodes = [
+        graph1 ?? defaultGraph({ sampled: false }),
+        graph2 ?? defaultGraph({ sampled: false }),
+        graph3 ?? defaultGraph({ sampled: false }),
+    ].map((g, i) => (<GradientContainer key={i} border="" z="none" className="border border-black">
+        <Mafs
+            width={"auto"}
+            height={height / 3}
+            viewBox={{ x: g.domain, y: g.range, padding: 0.0 }}
+            preserveAspectRatio={false}
+            pan={false}
+        >
+            <Coordinates.Cartesian
+                xAxis={{ lines: Math.round((g.domain[1] - g.domain[0]) / g.nSplits[0]) }}
+                yAxis={{ lines: Math.round((g.range[1] - g.range[0]) / g.nSplits[1]) }}
+            />
+            {
+                (g.func.sampled) ?
+                    (g.func.points.map((p, i) => <Point key={i} x={p.t} y={p.y} svgCircleProps={{ r: 2 }} />)) :
+                    <Plot.OfX y={g.func.f} />
+            }
 
+        </Mafs>
+    </GradientContainer>)
+    );
+    stop();
     return (
         <GradientContainer
             className="items-center py-12 space-x-8 p-4"
@@ -72,36 +95,13 @@ export default function FourierPlayground() {
                 className="flex-30 bg-white space-y-4"
                 style={{ height: height }}
             >
-                {[
-                    graph1 ?? defaultGraph({ sampled: false }),
-                    graph2 ?? defaultGraph({ sampled: false }),
-                    graph3 ?? defaultGraph({ sampled: true }),
-                ].map((g, i) => (<GradientContainer key={i} border="" z="none" className="border border-black">
-                    <Mafs
-                        width={"auto"}
-                        height={height / 3}
-                        viewBox={{ x: g.domain, y: g.range, padding: 0.0 }}
-                        preserveAspectRatio={false}
-                        pan={false}
-                    >
-                        <Coordinates.Cartesian
-                            xAxis={{ lines: Math.round((g.domain[1] - g.domain[0]) / g.nSplits[0]) }}
-                            yAxis={{ lines: Math.round((g.range[1] - g.range[0]) / g.nSplits[1]) }}
-                        />
-                        {
-                            (g.func.sampled) ?
-                                (g.func.points.map((p, i) => <Point key={i} x={p.x} y={p.y} svgCircleProps={{ r: 2 }} />)) :
-                                <Plot.OfX y={g.func.f} />
-                        }
-
-                    </Mafs>
-                </GradientContainer>)
-                )}
+                {graphNodes}
             </GradientContainer >
             <GradientContainer
                 className="flex-5 mt-4 space-y-2 "
                 z="none"
             >
+                {(loadedFile != null) ? <p>Loaded: {loadedFile}</p> : <></>}
                 <button
                     className="hover:cursor-pointer border border-sky-600 bg-white p-2 rounded-lg"
                     onClick={(_) => uploadAudioRef.current!.click()}
@@ -110,6 +110,7 @@ export default function FourierPlayground() {
                     ref={uploadAudioRef}
                     type="file"
                     onChange={(v) => {
+                        let stop = record("Audio file upload and processing");
                         const file = v.target.files?.item(0);
                         if (file == null || file == undefined) {
                             console.log("No file found")
@@ -119,27 +120,43 @@ export default function FourierPlayground() {
                             renderer!.setAudioClip(new Uint8Array(buf))
                             setLoadedFile(file.name);
                             setRendererState(renderer!.getState());
+                            stop()
                         })
 
                     }}
                     className="hidden"
                 />
-                <button
-                    className="hover:cursor-pointer border border-sky-600 bg-white p-2 rounded-lg"
-                    onClick={
-                        (_) => {
-                            renderer!.unloadAudioClip();
-                            setRendererState(renderer!.getState());
-                        }
-                    }
-                >Clear Audio</button>
+                {(rendererState.inner == ReadableState.SignalLoaded) ?
+                    (
+                        <><button
+                            className="hover:cursor-pointer border border-sky-600 bg-white p-2 rounded-lg"
+                            onClick={
+                                (_) => {
+                                    let stop = record("Unloading audio")
+                                    renderer!.unloadAudioClip();
+                                    setRendererState(renderer!.getState());
+                                    setLoadedFile(null);
+                                    stop()
+                                }
+                            }
+                        >Clear Audio</button>
+                            <button
+                                className="hover:cursor-pointer border border-sky-600 bg-white p-2 rounded-lg"
+                                onClick={
+                                    (_) => {
+                                        renderer!.playOriginal();
+                                    }
+                                }
+                            >Play Original Audio</button></>)
+                    : <></>}
+
             </GradientContainer>
         </GradientContainer>
     )
 }
 
 type Function = {
-    sampled: true, points: { x: number, y: number }[]
+    sampled: true, points: Point2F[]
 } | {
     sampled: false, f: (x: number) => number
 };
@@ -154,13 +171,15 @@ interface Graph {
 
 function createSampledGraph({
     samples,
+    additional
 }: {
-    samples: { x: number, y: number }[],
+    samples: Point2F[],
+    additional: SignalLoadedAdditional,
 }): Graph {
-    let minX = Math.min(...samples.map(s => s.x));
-    let maxX = Math.max(...samples.map(s => s.x));
-    let minY = Math.min(...samples.map(s => s.y));
-    let maxY = Math.max(...samples.map(s => s.y));
+    let minX = additional.original_signal_domain.t
+    let maxX = additional.original_signal_domain.y
+    let minY = additional.original_signal_range.t
+    let maxY = additional.original_signal_range.y
     return createGraph({
         graphDesc: { sampled: true, points: samples },
         start: [minX, minY],
@@ -202,7 +221,11 @@ function createGraph({
 function defaultGraph({ sampled }: { sampled: boolean }): Graph {
     if (sampled) {
         return createSampledGraph({
-            samples: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((x) => { return { x: x, y: 10 * Math.random() } })
+            samples: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((x) => new Point2F(x, 10 * Math.random())),
+            additional: new SignalLoadedAdditional(
+                new Point2F(0, 10),
+                new Point2F(0, 10),
+            )
         })
     } else {
         return createFunctionGraph({

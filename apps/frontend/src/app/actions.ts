@@ -47,51 +47,6 @@ export async function logOut() {
     await supabase.auth.signOut();
 }
 
-// *********************** NAIVE SOLUTION ***********************
-// TODO: Fetch all with minimal network calls
-
-export async function fetchSubjects() {
-    const supabase = await createClient();
-
-    const { data, error } = await supabase.from("subjects").select();
-    if (error != null) {
-        return {
-            success: false,
-            error: { message: error.message }
-        };
-    }
-
-    return { success: true, data: data };
-}
-
-
-export async function fetchCategories(subject_number: string) {
-    const supabase = await createClient();
-
-    const { data, error } = await supabase.from("categories").select().eq("subject_number", subject_number);
-    if (error != null) {
-        return {
-            success: false,
-            error: { message: error.message }
-        };
-    }
-
-    return { success: true, data: data };
-}
-
-export async function fetchPlaygrounds(category_number: string) {
-    const supabase = await createClient();
-
-    const { data, error } = await supabase.from("playgrounds").select().eq("category_number", category_number);
-    if (error != null) {
-        return {
-            success: false,
-            error: { message: error.message }
-        };
-    }
-
-    return { success: true, data: data };
-}
 
 export async function fetchCurrentUserProfile() {
     const supabase = await createClient();

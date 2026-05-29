@@ -28,9 +28,9 @@ fn main() -> anyhow::Result<()> {
             .context("Failed to write file.")?;
     fft_file.write_all(b"frequency\tamplitude\n").unwrap();
 
-    for (i, ampl) in signal.samples().iter().enumerate() {
+    for (i, s) in signal.samples().iter().enumerate() {
         signal_file
-            .write_all(&format!("{}\t{}\n", i as f32 * period, ampl).into_bytes())
+            .write_all(&format!("{}\t{}\n", i as f32 * period, s.y).into_bytes())
             .unwrap();
     }
     for f in fft.iter().take(fft.len() / 2) {

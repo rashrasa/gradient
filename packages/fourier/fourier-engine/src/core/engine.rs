@@ -4,12 +4,18 @@ use symphonia::core::{
     io::{MediaSourceStream, ReadOnlySource},
 };
 
-use crate::core::{DigitalSignal, FFTResult};
+use crate::core::{DigitalSignal, FFTResult, Point2F};
+
+#[derive(Debug, Clone, Copy)]
+pub struct SignalLoadedAdditional {
+    pub original_signal_domain: [f32; 2],
+    pub original_signal_range: [f32; 2],
+}
 
 #[derive(Debug, Clone)]
 pub enum State {
     Ready,
-    SignalLoaded(DigitalSignal, FFTResult),
+    SignalLoaded(DigitalSignal, FFTResult, SignalLoadedAdditional),
 }
 
 impl Default for State {
@@ -51,16 +57,23 @@ impl FourierEngine {
     }
 
     pub fn signal(&self) -> Option<&DigitalSignal> {
-        match &self.state {
-            State::Ready => None,
-            State::SignalLoaded(s, _) => Some(s),
+        if let State::SignalLoaded(s, ..) = &self.state {
+            return Some(s);
         }
+        None
+    }
+
+    pub fn signal_additional(&self) -> Option<&SignalLoadedAdditional> {
+        if let State::SignalLoaded(.., a) = &self.state {
+            return Some(a);
+        }
+        None
     }
 
     pub fn fft_result(&self) -> Option<&FFTResult> {
         match &self.state {
             State::Ready => None,
-            State::SignalLoaded(_, result) => Some(result),
+            State::SignalLoaded(_, result, ..) => Some(result),
         }
     }
 
@@ -142,10 +155,37 @@ impl FourierEngine {
             samples.push(sample / n_sets as f32);
         }
 
+        let mut t_min = f32::MAX;
+        let mut t_max = f32::MIN;
+        let mut y_min = f32::MAX;
+        let mut y_max = f32::MIN;
+
+        let samples = samples
+            .iter()
+            .enumerate()
+            .map(|(i, s)| {
+                let t = i as f32 / frequency as f32;
+                let y = *s;
+                t_min = t_min.min(t);
+                t_max = t_max.max(t);
+                y_min = y_min.min(y);
+                y_max = y_max.max(y);
+
+                Point2F { t, y }
+            })
+            .collect();
+
         let signal = DigitalSignal::new(frequency as f32, samples);
         let fft_result = FFTResult::from_signal(&signal);
 
-        self.state = State::SignalLoaded(signal, fft_result);
+        self.state = State::SignalLoaded(
+            signal,
+            fft_result,
+            SignalLoadedAdditional {
+                original_signal_domain: [t_min, t_max],
+                original_signal_range: [y_min, y_max],
+            },
+        );
         Ok(())
     }
 }

@@ -30,12 +30,14 @@ fn run() {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 pub fn unload() {
+    console_error_panic_hook::set_once();
     ENGINE.with_borrow_mut(|v| v.unload())
 }
 
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 pub fn load_audio_data(data: &[u8]) -> Result<(), String> {
+    console_error_panic_hook::set_once();
     ENGINE
         .with_borrow_mut(|v| {
             v.load_audio_data(data)
@@ -47,6 +49,7 @@ pub fn load_audio_data(data: &[u8]) -> Result<(), String> {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 pub fn get_signal() -> Option<DigitalSignal> {
+    console_error_panic_hook::set_once();
     ENGINE.with_borrow(|v| v.signal().map(|s| s.into()))
 }
 
@@ -55,12 +58,14 @@ pub fn get_signal() -> Option<DigitalSignal> {
 /// If ReadableState::SignalLoaded, the signal
 /// and fft values can be read.
 pub fn get_state() -> ReadableState {
+    console_error_panic_hook::set_once();
     ENGINE.with_borrow(|v| v.state().into())
 }
 
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 pub fn get_sorted_fft_result() -> Option<Vec<FFTValue>> {
+    console_error_panic_hook::set_once();
     ENGINE.with_borrow(|v| {
         v.fft_result()
             .map(|result| result.sorted_values().map(|value| value.into()).collect())
@@ -70,8 +75,16 @@ pub fn get_sorted_fft_result() -> Option<Vec<FFTValue>> {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 pub fn get_fft_result() -> Option<Vec<FFTValue>> {
+    console_error_panic_hook::set_once();
     ENGINE.with_borrow(|v| {
         v.fft_result()
             .map(|result| result.unsorted_values().map(|value| value.into()).collect())
     })
+}
+
+#[cfg(target_arch = "wasm32")]
+#[wasm_bindgen]
+pub fn get_signal_additional() -> Option<SignalLoadedAdditional> {
+    console_error_panic_hook::set_once();
+    ENGINE.with_borrow(|v| v.signal_additional().map(|a| a.into()))
 }

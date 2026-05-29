@@ -3,7 +3,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { User } from "@supabase/supabase-js";
 import { Tables } from "@/lib/supabase/database.types";
-import { Bucket } from "@supabase/storage-js";
 
 const SIGNED_URL_EXPIRY_SEC = 5 * 60;
 
@@ -143,14 +142,35 @@ export async function uploadAvatar(imageData: File): Promise<GradientException |
         }
         user = data.user;
     }
-
+    const userAvatarFolderPath = _userIdAvatarFolderPath(user.id);
+    const userAvatarImageDestinationPath = `${userAvatarFolderPath}/avatar.${imageData.name.split('.').pop()!}`;
+    let newImageName: string;
     {
         const { data, error } = await supabase.storage.from('avatars').upload(
-            `${_userIdAvatarFolderPath(user.id)}/avatar.${imageData.name.split('.').pop()!}`,
-            imageData
+            userAvatarImageDestinationPath,
+            imageData,
+            { upsert: true }
         );
         if (error != null) {
             return { message: error.message } as GradientException
+        }
+        newImageName = data.path.split("/").pop()!
+    }
+    // clean rest of folder
+    let paths;
+    {
+        const { data, error } = await supabase.storage.from('avatars').list(userAvatarFolderPath)
+        if (error != null) {
+            return { message: error.message } as GradientException
+        }
+        paths = data.filter(o => o.name != newImageName).map(o => `${userAvatarFolderPath}/${o.name}`);
+    }
+    {
+        if (paths.length > 0) {
+            const { data, error } = await supabase.storage.from('avatars').remove(paths);
+            if (error != null) {
+                return { message: error.message } as GradientException
+            }
         }
     }
     return null;

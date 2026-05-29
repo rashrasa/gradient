@@ -58,7 +58,6 @@ export default function UserProfile({ user, imageUrl }: { user: Tables<'users'>,
                             setDisplayName(ev.target.value);
                         }}
                         onStoppedEditing={() => {
-                            console.log(displayName)
                             formRef.current!.requestSubmit();
                         }}
                     />

@@ -3,11 +3,11 @@ import numpy as np
 import pandas as pd
 
 signal_data = pd.read_csv(
-    "packages/fourier/fourier-engine/bin/fft-test/result/signal.tsv", 
+    "packages/fourier-engine/bin/fft-test/result/signal.tsv", 
     sep="\t",
 )
 fft_data = pd.read_csv(
-    "packages/fourier/fourier-engine/bin/fft-test/result/fft.tsv", 
+    "packages/fourier-engine/bin/fft-test/result/fft.tsv", 
     sep="\t",
 )
 

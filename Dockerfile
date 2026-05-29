@@ -15,7 +15,7 @@ RUN rustup target add wasm32-unknown-unknown
 FROM cargo-chef AS native-planner
 COPY docker/native.Cargo.toml Cargo.toml
 COPY Cargo.lock Cargo.lock
-COPY packages/fourier/fourier-engine packages/fourier/fourier-engine
+COPY packages/fourier-engine packages/fourier-engine
 COPY apps/backend apps/backend
 RUN cargo chef prepare --recipe-path recipe.json
 
@@ -24,7 +24,7 @@ COPY --from=native-planner /app/recipe.json recipe.json
 RUN cargo chef cook --release --recipe-path recipe.json
 COPY docker/native.Cargo.toml Cargo.toml
 COPY Cargo.lock Cargo.lock
-COPY packages/fourier/fourier-engine packages/fourier/fourier-engine
+COPY packages/fourier-engine packages/fourier-engine
 COPY apps/backend apps/backend
 RUN cargo build --release -p backend
 
@@ -33,7 +33,7 @@ COPY --from=native-planner /app/recipe.json recipe.json
 RUN cargo chef cook --recipe-path recipe.json
 COPY docker/native.Cargo.toml Cargo.toml
 COPY Cargo.lock Cargo.lock
-COPY packages/fourier/fourier-engine packages/fourier/fourier-engine
+COPY packages/fourier-engine packages/fourier-engine
 COPY apps/backend apps/backend
 RUN cargo build -p backend
 
@@ -42,7 +42,7 @@ RUN cargo build -p backend
 FROM cargo-chef-wasm AS wasm-planner
 COPY docker/wasm.Cargo.toml Cargo.toml
 COPY Cargo.lock Cargo.lock
-COPY packages/fourier/fourier-engine packages/fourier/fourier-engine
+COPY packages/fourier-engine packages/fourier-engine
 RUN cargo chef prepare --recipe-path recipe.json
 
 FROM cargo-chef-wasm AS wasm-builder-prod
@@ -50,16 +50,16 @@ COPY --from=wasm-planner /app/recipe.json recipe.json
 RUN cargo chef cook --release --target wasm32-unknown-unknown --recipe-path recipe.json
 COPY docker/wasm.Cargo.toml Cargo.toml
 COPY Cargo.lock Cargo.lock
-COPY packages/fourier/fourier-engine packages/fourier/fourier-engine
-RUN wasm-pack build packages/fourier/fourier-engine --target bundler --release
+COPY packages/fourier-engine packages/fourier-engine
+RUN wasm-pack build packages/fourier-engine --target bundler --release
 
 FROM cargo-chef-wasm AS wasm-builder-dev
 COPY --from=wasm-planner /app/recipe.json recipe.json
 RUN cargo chef cook --target wasm32-unknown-unknown --recipe-path recipe.json
 COPY docker/wasm.Cargo.toml Cargo.toml
 COPY Cargo.lock Cargo.lock
-COPY packages/fourier/fourier-engine packages/fourier/fourier-engine
-RUN wasm-pack build packages/fourier/fourier-engine --target bundler
+COPY packages/fourier-engine packages/fourier-engine
+RUN wasm-pack build packages/fourier-engine --target bundler
 
 ## Node
 
@@ -71,11 +71,11 @@ COPY docker/fourier-engine-package.json apps/frontend/packages/fourier-engine/pa
 RUN pnpm install --frozen-lockfile -C apps/frontend
 
 FROM node-deps AS next-builder-prod
-COPY --from=wasm-builder-prod /app/packages/fourier/fourier-engine/pkg apps/frontend/packages/fourier-engine
+COPY --from=wasm-builder-prod /app/packages/fourier-engine/pkg apps/frontend/packages/fourier-engine
 RUN pnpm run -C apps/frontend build
 
 FROM node-deps AS next-builder-dev
-COPY --from=wasm-builder-dev /app/packages/fourier/fourier-engine/pkg apps/frontend/packages/fourier-engine
+COPY --from=wasm-builder-dev /app/packages/fourier-engine/pkg apps/frontend/packages/fourier-engine
 
 # Services
 

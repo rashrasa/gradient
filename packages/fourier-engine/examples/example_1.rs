@@ -18,9 +18,9 @@ fn main() {
         sample_format: hound::SampleFormat::Float,
     };
 
-    std::fs::create_dir_all("packages/fourier/fourier-engine/examples/generated").unwrap();
+    std::fs::create_dir_all("packages/fourier-engine/examples/generated").unwrap();
     let mut writer = hound::WavWriter::create(
-        "packages/fourier/fourier-engine/examples/generated/sample.wav",
+        "packages/fourier-engine/examples/generated/sample.wav",
         audio_spec,
     )
     .unwrap();

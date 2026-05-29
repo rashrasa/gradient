@@ -15,17 +15,16 @@ fn main() -> anyhow::Result<()> {
         .map(|v| *v)
         .collect();
 
-    std::fs::create_dir_all("packages/fourier/fourier-engine/bin/fft-test/result").unwrap();
+    std::fs::create_dir_all("packages/fourier-engine/bin/fft-test/result").unwrap();
 
     let mut signal_file =
-        std::fs::File::create("packages/fourier/fourier-engine/bin/fft-test/result/signal.tsv")
+        std::fs::File::create("packages/fourier-engine/bin/fft-test/result/signal.tsv")
             .context("Failed to write file.")?;
 
     signal_file.write_all(b"time\tamplitude\n").unwrap();
 
-    let mut fft_file =
-        std::fs::File::create("packages/fourier/fourier-engine/bin/fft-test/result/fft.tsv")
-            .context("Failed to write file.")?;
+    let mut fft_file = std::fs::File::create("packages/fourier-engine/bin/fft-test/result/fft.tsv")
+        .context("Failed to write file.")?;
     fft_file.write_all(b"frequency\tamplitude\n").unwrap();
 
     for (i, s) in signal.samples().iter().enumerate() {

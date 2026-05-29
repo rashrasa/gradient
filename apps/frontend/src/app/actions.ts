@@ -3,10 +3,11 @@
 import { createClient } from "@/lib/supabase/server";
 import { User } from "@supabase/supabase-js";
 import { Tables } from "@/lib/supabase/database.types";
+import { Bucket } from "@supabase/storage-js";
 
 const SIGNED_URL_EXPIRY_SEC = 5 * 60;
 
-export interface GradientException {
+export interface GradientException extends Error {
     message: string,
 }
 
@@ -19,7 +20,7 @@ export async function login(email: string, password: string): Promise<LoginResul
     if (error != null) {
         return {
             success: false,
-            error: { message: error.message }
+            error: { message: error.message, name: error.name }
         };
     }
 
@@ -34,7 +35,7 @@ export async function signUp(email: string, password: string): Promise<SignUpRes
     if (error != null) {
         return {
             success: false,
-            error: { message: error.message }
+            error: { message: error.message, name: error.name }
         };
     }
 
@@ -102,7 +103,6 @@ export async function fetchUserAvatar(userId: string) {
             return null;
         } else {
             if (data.length == 0) {
-                console.log("No avatar found at " + _userIdAvatarFolderPath(userId));
                 return null;
             }
             for (const object of data) {
@@ -130,6 +130,30 @@ export async function fetchUserAvatar(userId: string) {
     } else {
         return null;
     }
+}
+
+export async function uploadAvatar(imageData: File): Promise<GradientException | null> {
+    const supabase = await createClient();
+
+    let user: User;
+    {
+        const { data, error } = await supabase.auth.getUser();
+        if (error != null) {
+            throw { message: error.message } as GradientException
+        }
+        user = data.user;
+    }
+
+    {
+        const { data, error } = await supabase.storage.from('avatars').upload(
+            `${_userIdAvatarFolderPath(user.id)}/avatar.${imageData.name.split('.').pop()!}`,
+            imageData
+        );
+        if (error != null) {
+            return { message: error.message } as GradientException
+        }
+    }
+    return null;
 }
 
 

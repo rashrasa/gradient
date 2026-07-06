@@ -46,7 +46,6 @@ export class FourierEngineRenderer {
         this.state = {
             inner: ReadableState.SignalLoaded,
         };
-
     }
 
     public getState(): FourierEngineRendererState {

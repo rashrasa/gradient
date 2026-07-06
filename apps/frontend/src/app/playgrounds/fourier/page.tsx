@@ -3,7 +3,7 @@
 import GradientContainer from "@/app/components/common/GradientContainer"
 import { useEffect, useRef, useState } from "react";
 import { FourierEngineRenderer, FourierEngineRendererState } from "@/lib/playgrounds/fourierEngine";
-import { DigitalSignal, FFTValue, ReadableState, Point2F, SignalLoadedAdditional } from "fourier-engine";
+import { ReadableState } from "fourier-engine";
 import { record } from "@/lib/debug/profile";
 
 let renderer: FourierEngineRenderer | undefined;
@@ -101,7 +101,3 @@ export default function FourierPlayground() {
     )
 }
 
-
-function fftToFunction(fft: FFTValue): (x: number) => number {
-    return (x: number) => fft.amplitude * Math.sin(1.0 / fft.frequency * x + fft.phase);
-}

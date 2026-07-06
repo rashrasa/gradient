@@ -1,3 +1,5 @@
+use std::io::Cursor;
+
 use anyhow::Context;
 use symphonia::core::{
     formats::{TrackType, probe::Hint},
@@ -21,9 +23,23 @@ pub enum State {
 
 #[derive(Debug, Clone)]
 pub struct SignalLoaded {
-    signal: DigitalSignal,
-    fft: FFTResult,
-    additional: SignalLoadedAdditional,
+    pub signal: DigitalSignal,
+    pub fft: FFTResult,
+
+    pub playable: Playable,
+}
+
+#[derive(Debug, Clone)]
+pub struct Playable {
+    pub original_wav: Vec<u8>,
+
+    pub partial_frequency_counts: Vec<PlayablePartial>,
+}
+
+#[derive(Debug, Clone)]
+pub struct PlayablePartial {
+    pub n_freqs: usize,
+    pub wav: Vec<u8>,
 }
 
 #[derive(Debug, Default)]
@@ -52,25 +68,11 @@ impl FourierEngine {
         &self.state
     }
 
-    pub fn signal(&self) -> Option<&DigitalSignal> {
+    pub fn try_loaded(&self) -> Option<&SignalLoaded> {
         if let State::SignalLoaded(loaded) = &self.state {
-            return Some(&loaded.signal);
+            return Some(loaded);
         }
         None
-    }
-
-    pub fn signal_additional(&self) -> Option<&SignalLoadedAdditional> {
-        if let State::SignalLoaded(loaded) = &self.state {
-            return Some(&loaded.additional);
-        }
-        None
-    }
-
-    pub fn fft_result(&self) -> Option<&FFTResult> {
-        match &self.state {
-            State::Ready => None,
-            State::SignalLoaded(loaded) => Some(&loaded.fft),
-        }
     }
 
     pub fn unload(&mut self) {
@@ -151,31 +153,42 @@ impl FourierEngine {
             samples.push(sample / n_sets as f32);
         }
 
-        let mut t_min = f32::MAX;
-        let mut t_max = f32::MIN;
-        let mut y_min = f32::MAX;
-        let mut y_max = f32::MIN;
+        let signal = DigitalSignal::new(frequency, samples);
+        let fft = FFTResult::from_signal(&signal);
 
-        for (i, s) in samples.iter().enumerate() {
-            let t = i as f32 / frequency as f32;
-            let y = *s;
-            t_min = t_min.min(t);
-            t_max = t_max.max(t);
-            y_min = y_min.min(y);
-            y_max = y_max.max(y);
-        }
+        let original_wav = samples_to_wav_bytes(signal.samples().to_vec(), signal.frequency(), 1)?;
 
-        let signal = DigitalSignal::new(frequency as f32, samples);
-        let fft_result = FFTResult::from_signal(&signal);
+        let playable = Playable {
+            original_wav,
+            partial_frequency_counts: vec![],
+        };
 
         self.state = State::SignalLoaded(SignalLoaded {
             signal,
-            fft: fft_result,
-            additional: SignalLoadedAdditional {
-                original_signal_domain: [t_min, t_max],
-                original_signal_range: [y_min, y_max],
-            },
+            fft,
+            playable,
         });
         Ok(())
     }
+}
+
+fn samples_to_wav_bytes(
+    samples: Vec<f32>,
+    sample_rate: u32,
+    channels: u16,
+) -> anyhow::Result<Vec<u8>> {
+    let original_spec = hound::WavSpec {
+        channels,
+        sample_rate,
+        bits_per_sample: 32,
+        sample_format: hound::SampleFormat::Float,
+    };
+    let mut writer = Cursor::new(Vec::<u8>::with_capacity(samples.len()));
+    let mut original_wav = hound::WavWriter::new(&mut writer, original_spec)?;
+    for sample in samples {
+        original_wav.write_sample(sample)?;
+    }
+    original_wav.finalize()?;
+
+    Ok(writer.into_inner())
 }

@@ -29,7 +29,7 @@ pub enum ReadableState {
 
 #[wasm_bindgen]
 pub struct DigitalSignal {
-    pub frequency: f32,
+    pub frequency: u32,
     samples: Vec<f32>,
 }
 

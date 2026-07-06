@@ -4,11 +4,12 @@ use anyhow::Context;
 use fourier_engine::core::{DigitalSignal, FFTResult, FFTValue, Function};
 
 fn main() -> anyhow::Result<()> {
-    let freq = 240.0;
-    let period = 1.0 / freq;
+    let freq = 240;
+    let period = 1.0 / freq as f32;
     let dur = 360.0;
 
-    let samples = Function::new(|x| (x * 3.0).sin() + (x * 2.0).cos()).sample(0.0, dur, freq);
+    let samples =
+        Function::new(|x| (x * 3.0).sin() + (x * 2.0).cos()).sample(0.0, dur, freq as f32);
     let signal = DigitalSignal::new(freq, samples);
     let fft: Vec<FFTValue> = FFTResult::from_signal(&signal)
         .sorted_values()

@@ -24,7 +24,7 @@ impl FFTValue {
 
 #[derive(Debug, Clone)]
 pub struct FFTResult {
-    original_frequency: f32,
+    original_frequency: u32,
     original_sample_count: usize,
 
     values: MaxVec<FFTValue>,
@@ -58,7 +58,7 @@ impl FFTResult {
             .enumerate()
             .take((fft.len() as f32 / 2.0 + 1.0) as usize)
             .map(|(i, z)| FFTValue {
-                frequency: i as f32 * sampling_frequency / fft.len() as f32,
+                frequency: i as f32 * sampling_frequency as f32 / fft.len() as f32,
                 result: *z,
             })
             .collect();
@@ -78,7 +78,7 @@ impl FFTResult {
             reconstructed,
         }
     }
-    pub fn original_frequency(&self) -> f32 {
+    pub fn original_frequency(&self) -> u32 {
         self.original_frequency
     }
 

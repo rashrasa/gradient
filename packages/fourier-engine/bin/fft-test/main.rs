@@ -12,7 +12,7 @@ fn main() -> anyhow::Result<()> {
     let signal = DigitalSignal::new(freq, samples);
     let fft: Vec<FFTValue> = FFTResult::from_signal(&signal)
         .sorted_values()
-        .map(|v| *v)
+        .copied()
         .collect();
 
     std::fs::create_dir_all("packages/fourier-engine/bin/fft-test/result").unwrap();

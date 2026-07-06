@@ -72,6 +72,10 @@ impl<T> Original<'_, T> {
     pub fn len(&self) -> usize {
         self.values.len()
     }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
 }
 
 impl<'a, T> Iterator for Original<'a, T>
@@ -90,6 +94,10 @@ where
 impl<T> Sorted<'_, T> {
     pub fn len(&self) -> usize {
         self.length
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
     }
 }
 

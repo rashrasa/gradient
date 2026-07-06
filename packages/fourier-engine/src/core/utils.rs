@@ -1,12 +1,10 @@
-use crate::core::Point2F;
-
 pub struct Function {
     f: fn(f32) -> f32,
 }
 
 impl Function {
     pub fn new(f: fn(f32) -> f32) -> Self {
-        return Function { f };
+        Function { f }
     }
 
     pub fn sample(&self, start: f32, end: f32, freq: f32) -> Vec<f32> {

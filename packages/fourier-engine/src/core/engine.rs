@@ -4,7 +4,7 @@ use symphonia::core::{
     io::{MediaSourceStream, ReadOnlySource},
 };
 
-use crate::core::{DigitalSignal, FFTResult, Point2F};
+use crate::core::{DigitalSignal, FFTResult};
 
 #[derive(Debug, Clone, Copy)]
 pub struct SignalLoadedAdditional {
@@ -12,26 +12,15 @@ pub struct SignalLoadedAdditional {
     pub original_signal_range: [f32; 2],
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub enum State {
+    #[default]
     Ready,
     SignalLoaded(DigitalSignal, FFTResult, SignalLoadedAdditional),
 }
 
-impl Default for State {
-    fn default() -> Self {
-        Self::Ready
-    }
-}
-
-#[derive(Debug)]
+#[derive(Debug, Default)]
 struct Configuration {}
-
-impl Default for Configuration {
-    fn default() -> Self {
-        Self {}
-    }
-}
 
 // store
 //  original audio

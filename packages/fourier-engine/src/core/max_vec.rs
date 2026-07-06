@@ -16,18 +16,12 @@ use std::cmp::Ordering;
 /// This requires a sort_by closure to avoid introducing
 /// an Ord trait bound on T (mainly to allow storing floats).
 #[derive(Debug, Clone)]
-pub struct MaxVec<T>
-where
-    T: Sized,
-{
+pub struct MaxVec<T> {
     sorted: Vec<T>,
     original: Vec<usize>,
 }
 
-impl<T> MaxVec<T>
-where
-    T: Sized,
-{
+impl<T> MaxVec<T> {
     pub fn new<F>(data: Vec<T>, mut sort_by: F) -> Self
     where
         F: FnMut(&T, &T) -> Ordering,
@@ -78,10 +72,7 @@ impl<T> Original<'_, T> {
     }
 }
 
-impl<'a, T> Iterator for Original<'a, T>
-where
-    T: Sized,
-{
+impl<'a, T> Iterator for Original<'a, T> {
     type Item = &'a T;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -105,10 +96,7 @@ pub struct Sorted<'a, T> {
     inner: std::slice::Iter<'a, T>,
     length: usize,
 }
-impl<'a, T> Iterator for Sorted<'a, T>
-where
-    T: Sized,
-{
+impl<'a, T> Iterator for Sorted<'a, T> {
     type Item = &'a T;
 
     fn next(&mut self) -> Option<Self::Item> {

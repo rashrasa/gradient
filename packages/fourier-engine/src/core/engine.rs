@@ -16,7 +16,14 @@ pub struct SignalLoadedAdditional {
 pub enum State {
     #[default]
     Ready,
-    SignalLoaded(DigitalSignal, FFTResult, SignalLoadedAdditional),
+    SignalLoaded(SignalLoaded),
+}
+
+#[derive(Debug, Clone)]
+pub struct SignalLoaded {
+    signal: DigitalSignal,
+    fft: FFTResult,
+    additional: SignalLoadedAdditional,
 }
 
 #[derive(Debug, Default)]
@@ -46,15 +53,15 @@ impl FourierEngine {
     }
 
     pub fn signal(&self) -> Option<&DigitalSignal> {
-        if let State::SignalLoaded(s, ..) = &self.state {
-            return Some(s);
+        if let State::SignalLoaded(loaded) = &self.state {
+            return Some(&loaded.signal);
         }
         None
     }
 
     pub fn signal_additional(&self) -> Option<&SignalLoadedAdditional> {
-        if let State::SignalLoaded(.., a) = &self.state {
-            return Some(a);
+        if let State::SignalLoaded(loaded) = &self.state {
+            return Some(&loaded.additional);
         }
         None
     }
@@ -62,7 +69,7 @@ impl FourierEngine {
     pub fn fft_result(&self) -> Option<&FFTResult> {
         match &self.state {
             State::Ready => None,
-            State::SignalLoaded(_, result, ..) => Some(result),
+            State::SignalLoaded(loaded) => Some(&loaded.fft),
         }
     }
 
@@ -161,14 +168,14 @@ impl FourierEngine {
         let signal = DigitalSignal::new(frequency as f32, samples);
         let fft_result = FFTResult::from_signal(&signal);
 
-        self.state = State::SignalLoaded(
+        self.state = State::SignalLoaded(SignalLoaded {
             signal,
-            fft_result,
-            SignalLoadedAdditional {
+            fft: fft_result,
+            additional: SignalLoadedAdditional {
                 original_signal_domain: [t_min, t_max],
                 original_signal_range: [y_min, y_max],
             },
-        );
+        });
         Ok(())
     }
 }

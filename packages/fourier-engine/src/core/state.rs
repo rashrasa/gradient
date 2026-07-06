@@ -1,6 +1,6 @@
 #[derive(Debug, Clone)]
 pub struct DigitalSignal {
-    samples: Vec<Point2F>,
+    samples: Vec<f32>,
     frequency: f32,
 }
 
@@ -10,11 +10,11 @@ pub struct Point2F {
     pub y: f32,
 }
 impl DigitalSignal {
-    pub fn new(frequency: f32, samples: Vec<Point2F>) -> Self {
+    pub fn new(frequency: f32, samples: Vec<f32>) -> Self {
         DigitalSignal { frequency, samples }
     }
 
-    pub fn samples(&self) -> &[Point2F] {
+    pub fn samples(&self) -> &[f32] {
         &self.samples
     }
 

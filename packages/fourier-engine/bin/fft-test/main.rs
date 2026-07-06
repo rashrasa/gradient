@@ -29,7 +29,7 @@ fn main() -> anyhow::Result<()> {
 
     for (i, s) in signal.samples().iter().enumerate() {
         signal_file
-            .write_all(&format!("{}\t{}\n", i as f32 * period, s.y).into_bytes())
+            .write_all(&format!("{}\t{}\n", i as f32 * period, *s).into_bytes())
             .unwrap();
     }
     for f in fft.iter().take(fft.len() / 2) {

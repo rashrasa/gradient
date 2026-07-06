@@ -39,7 +39,7 @@ impl FFTResult {
         let mut samples = signal
             .samples()
             .iter()
-            .map(|s| ComplexFloat::standard(s.y, 0.0))
+            .map(|s| ComplexFloat::standard(*s, 0.0))
             .collect::<Vec<ComplexFloat>>();
 
         let original_sample_count = samples.len();
@@ -149,7 +149,7 @@ fn inverse_fft(values: &[ComplexFloat], sample_count: usize) -> Vec<ComplexFloat
 mod tests {
     use approx::assert_relative_eq;
 
-    use crate::core::{Function, Point2F};
+    use crate::core::Function;
 
     use super::*;
 
@@ -159,13 +159,13 @@ mod tests {
         let function = Function::new(|x| 3.0 * (3.0 * x).sin() + 9.0 * (PI / 4.0 * x).sin());
         let mut samples = function.sample(0.0, 5.0, frequency);
         if !samples.len().is_power_of_two() {
-            samples.resize(samples.len().next_power_of_two(), Point2F { t: 0.0, y: 0.0 });
+            samples.resize(samples.len().next_power_of_two(), 0.0);
         }
         let sample_count = samples.len();
 
         let samples_complex = samples
             .iter()
-            .map(|v| ComplexFloat::standard(v.y, 0.0))
+            .map(|v| ComplexFloat::standard(*v, 0.0))
             .collect::<Vec<ComplexFloat>>();
 
         let fft_values: Vec<ComplexFloat> = fft_recursive(&samples_complex);
@@ -184,13 +184,13 @@ mod tests {
         let function = Function::new(|x| 3.0 * (3.0 * x).sin() + 9.0 * (PI / 4.0 * x).sin());
         let mut samples = function.sample(0.0, 5.0, frequency);
         if !samples.len().is_power_of_two() {
-            samples.resize(samples.len().next_power_of_two(), Point2F { t: 0.0, y: 0.0 });
+            samples.resize(samples.len().next_power_of_two(), 0.0);
         }
         let sample_count = samples.len();
         let fft_values: Vec<ComplexFloat> = fft_recursive(
             &samples
                 .iter()
-                .map(|v| ComplexFloat::standard(v.y, 0.0))
+                .map(|v| ComplexFloat::standard(*v, 0.0))
                 .collect::<Vec<ComplexFloat>>(),
         );
 

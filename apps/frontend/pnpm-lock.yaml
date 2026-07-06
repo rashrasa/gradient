@@ -29,9 +29,6 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.110.0
         version: 2.110.0
-      chart.js:
-        specifier: ^4.5.1
-        version: 4.5.1
       fourier-engine:
         specifier: workspace:*
         version: link:packages/fourier-engine
@@ -41,15 +38,9 @@ importers:
       react:
         specifier: 19.2.6
         version: 19.2.6
-      react-chartjs-2:
-        specifier: ^5.3.1
-        version: 5.3.1(chart.js@4.5.1)(react@19.2.6)
       react-dom:
         specifier: 19.2.6
         version: 19.2.6(react@19.2.6)
-      regl-scatterplot:
-        specifier: ^1.16.0
-        version: 1.16.0(pub-sub-es@3.0.0)(regl@2.1.1)
       wavesurfer.js:
         specifier: ^7.12.8
         version: 7.12.8
@@ -257,9 +248,6 @@ packages:
     resolution: {integrity: sha512-+CNAzxglkrpNf/kKywqQfk74QjtceuOE7Qm+AF8miRvPF/wmmK5+OJOgVh3AVTT3RP2mH3+FOaxlE5v72owk0A==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
 
-  '@flekschas/utils@0.33.0':
-    resolution: {integrity: sha512-THnZZqtQ5me5kgF9xzI0oYJ8D+524kKXKCUJErAmlT8pfw2iTwiyPDS8f3SqrY9Y7M8zNY2dGME+JBUpKypEqg==}
-
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
     engines: {node: '>=18.18.0'}
@@ -448,9 +436,6 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
-
-  '@kurkle/color@0.3.4':
-    resolution: {integrity: sha512-M5UknZPHRu3DEDWoipU6sE8PdkZ6Z/S+v4dD+Ke8IaNlpdSQah50lz1KtcFBa2vsdOnwbbnxJwVM4wty6udA5w==}
 
   '@mui/core-downloads-tracker@9.2.0':
     resolution: {integrity: sha512-+XMav+ZaXkZKUFUgzjrfMEedfyJKxxviAske2q8N8CWDMeqZdDU2lWMkiUPiB388hGaDqhwvOAwkrsc/pUyp8g==}
@@ -1088,17 +1073,8 @@ packages:
     resolution: {integrity: sha512-P8BjAsXvZS+VIDUI11hHCQEv74YT67YUi5JJFNWIqL235sBmjX4+qx9Muvls5ivyNENctx46xQLQ3aTuE7ssaQ==}
     engines: {node: '>=6'}
 
-  camera-2d-simple@3.0.0:
-    resolution: {integrity: sha512-hBeuUeerQ2Repi/61PGyFkuJ9jt6IKAny7pjQo2w8/8uZh+RKvNLZQy4xbQeDH8FrlnFxAJDjyM4/yuLdOV5vQ==}
-    peerDependencies:
-      gl-matrix: ~3.3.0
-
   caniuse-lite@1.0.30001800:
     resolution: {integrity: sha512-MMHtuAz9Ys840zAY5F4k6fV5GaivZ9sPk+nz0mY+GYVzRBnYkN0mpqkSR92oWRQ19yQWo4HvBV/FnC16AJX8MA==}
-
-  chart.js@4.5.1:
-    resolution: {integrity: sha512-GIjfiT9dbmHRiYi6Nl2yFCq7kkwdkp1W/lp2J99rX0yo9tgJGn3lKQATztIjb5tVtevcBtIdICNWqlq5+E8/Pw==}
-    engines: {pnpm: '>=8'}
 
   client-only@0.0.1:
     resolution: {integrity: sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==}
@@ -1182,11 +1158,6 @@ packages:
     resolution: {integrity: sha512-35mSku4ZXK0vfCuHEDAwt55dg2jNajHZ1odvF+8SSr82EsZY4QmXfuWso8oEd8zRhVObSN18aM0CjSdoBX7zIw==}
     engines: {node: '>=0.10.0'}
 
-  dom-2d-camera@2.2.6:
-    resolution: {integrity: sha512-HWfV26qjCfpOHa6X0PI1ZyZDhowk6skEs5f7aOwgewuJSP6IgPcK694ImYIOMGnDYK4vC4/Etsi26WpbJtS2vQ==}
-    peerDependencies:
-      gl-matrix: ^3.3.0
-
   dom-helpers@5.2.1:
     resolution: {integrity: sha512-nRCa7CK3VTrM2NmGkIy4cbK7IZlgBE/PYMn55rrXefr5xXDP0LdtfPnblFDoVdcAfslJ7or6iqAUnx0CCGIWQA==}
 
@@ -1209,9 +1180,6 @@ packages:
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
     engines: {node: '>= 0.4'}
-
-  earcut@3.2.3:
-    resolution: {integrity: sha512-vnS4AVwp1KHAF13i1vp1/2D5evWy3k5u/iW/B81QVsUZtV8cv2tU0b2VNFlqvh4kYwrFMDdjPCfAmfyJW9y14Q==}
 
   electron-to-chromium@1.5.387:
     resolution: {integrity: sha512-TaxwufTFDufvPEoXdhwVrA3UdFWBeWGkYoJ1K8ldF1xe6gKfth6iRNS5lTQ5JPNOHdGQm8PT1QYKUqFLCiUefQ==}
@@ -1469,9 +1437,6 @@ packages:
 
   get-tsconfig@4.14.0:
     resolution: {integrity: sha512-yTb+8DXzDREzgvYmh6s9vHsSVCHeC0G3PI5bEXNBHtmshPnO+S5O7qgLEOn0I5QvMy6kpZN8K1NKGyilLb93wA==}
-
-  gl-matrix@3.4.4:
-    resolution: {integrity: sha512-latSnyDNt/8zYUB6VIJ6PCh2jBjJX6gnDsoCZ7LyW7GkqrD51EWwa9qCoGixj8YqBtETQK/xY7OmpTF8xz1DdQ==}
 
   glob-parent@5.1.2:
     resolution: {integrity: sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==}
@@ -1982,21 +1947,12 @@ packages:
   prop-types@15.8.1:
     resolution: {integrity: sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==}
 
-  pub-sub-es@3.0.0:
-    resolution: {integrity: sha512-pf+6yCPsOfvDMru2LnsqdKSN8XQyF5HZzmEoKBvjMk4TILMUQiq1vxI6rC92T9ErY06sLXBmC1p7JGNFVB1pUQ==}
-
   punycode@2.3.1:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
 
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
-
-  react-chartjs-2@5.3.1:
-    resolution: {integrity: sha512-h5IPXKg9EXpjoBzUfyWJvllMjG2mQ4EiuHQFhms/AjUm0XSZHhyRy2xVmLXHKrtcdrPO4mnGqRtYoD0vp95A0A==}
-    peerDependencies:
-      chart.js: ^4.1.1
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   react-dom@19.2.6:
     resolution: {integrity: sha512-0prMI+hvBbPjsWnxDLxlCGyM8PN6UuWjEUCYmZhO67xIV9Xasa/r/vDnq+Xyq4Lo27g8QSbO5YzARu0D1Sps3g==}
@@ -2026,21 +1982,6 @@ packages:
   regexp.prototype.flags@1.5.4:
     resolution: {integrity: sha512-dYqgNSZbDwkaJ2ceRd9ojCGjBq+mOm9LmtXnAnEGyHhN/5R7iDW2TRw3h+o/jCFxus3P2LfWIIiwowAjANm7IA==}
     engines: {node: '>= 0.4'}
-
-  regl-line@1.1.1:
-    resolution: {integrity: sha512-IKcyiZq+nQg7x3mEmxf9kImM9CzmEyZDhCCfas2xVpsoiDJFEyILsuocD1G4dSXA/nC39za9OBw4FzYEgWNiUg==}
-    peerDependencies:
-      regl: ^2.1.0
-
-  regl-scatterplot@1.16.0:
-    resolution: {integrity: sha512-LSNRzihkLgaSEALZv95+w02nX1c6slJJahqHqMNY0YOkE3L6Bk1e38GJaGatW2w8PlB1tOdvq3Cj0tPPrBhpsA==}
-    engines: {node: '>=20.0.0', npm: '>=7.0.0'}
-    peerDependencies:
-      pub-sub-es: ~3.0.0
-      regl: ~2.1.1
-
-  regl@2.1.1:
-    resolution: {integrity: sha512-+IOGrxl3FZ8ZM9ixCWQZzFRiRn7Rzn9bu3iFHwg/yz4tlOUQgbO4PHLgG+1ZT60zcIV8tief6Qrmyl8qcoJP0g==}
 
   resolve-from@4.0.0:
     resolution: {integrity: sha512-pb/MYmXstAkysRFx8piNI1tGFNQIFA3vkE3Gq4EuA1dF6gHp/+vgZqsCGJapvy8N3Q+4o7FwvquPJcnZ7RYy4g==}
@@ -2558,8 +2499,6 @@ snapshots:
       '@eslint/core': 1.2.1
       levn: 0.4.1
 
-  '@flekschas/utils@0.33.0': {}
-
   '@humanfs/core@0.19.2':
     dependencies:
       '@humanfs/types': 0.15.0
@@ -2691,8 +2630,6 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
-
-  '@kurkle/color@0.3.4': {}
 
   '@mui/core-downloads-tracker@9.2.0': {}
 
@@ -3286,15 +3223,7 @@ snapshots:
 
   callsites@3.1.0: {}
 
-  camera-2d-simple@3.0.0(gl-matrix@3.4.4):
-    dependencies:
-      gl-matrix: 3.4.4
-
   caniuse-lite@1.0.30001800: {}
-
-  chart.js@4.5.1:
-    dependencies:
-      '@kurkle/color': 0.3.4
 
   client-only@0.0.1: {}
 
@@ -3372,11 +3301,6 @@ snapshots:
     dependencies:
       esutils: 2.0.3
 
-  dom-2d-camera@2.2.6(gl-matrix@3.4.4):
-    dependencies:
-      camera-2d-simple: 3.0.0(gl-matrix@3.4.4)
-      gl-matrix: 3.4.4
-
   dom-helpers@5.2.1:
     dependencies:
       '@babel/runtime': 7.29.7
@@ -3402,8 +3326,6 @@ snapshots:
       call-bind-apply-helpers: 1.0.2
       es-errors: 1.3.0
       gopd: 1.2.0
-
-  earcut@3.2.3: {}
 
   electron-to-chromium@1.5.387: {}
 
@@ -3829,8 +3751,6 @@ snapshots:
   get-tsconfig@4.14.0:
     dependencies:
       resolve-pkg-maps: 1.0.0
-
-  gl-matrix@3.4.4: {}
 
   glob-parent@5.1.2:
     dependencies:
@@ -4312,16 +4232,9 @@ snapshots:
       object-assign: 4.1.1
       react-is: 16.13.1
 
-  pub-sub-es@3.0.0: {}
-
   punycode@2.3.1: {}
 
   queue-microtask@1.2.3: {}
-
-  react-chartjs-2@5.3.1(chart.js@4.5.1)(react@19.2.6):
-    dependencies:
-      chart.js: 4.5.1
-      react: 19.2.6
 
   react-dom@19.2.6(react@19.2.6):
     dependencies:
@@ -4362,23 +4275,6 @@ snapshots:
       get-proto: 1.0.1
       gopd: 1.2.0
       set-function-name: 2.0.2
-
-  regl-line@1.1.1(regl@2.1.1):
-    dependencies:
-      gl-matrix: 3.4.4
-      regl: 2.1.1
-
-  regl-scatterplot@1.16.0(pub-sub-es@3.0.0)(regl@2.1.1):
-    dependencies:
-      '@flekschas/utils': 0.33.0
-      dom-2d-camera: 2.2.6(gl-matrix@3.4.4)
-      earcut: 3.2.3
-      gl-matrix: 3.4.4
-      pub-sub-es: 3.0.0
-      regl: 2.1.1
-      regl-line: 1.1.1(regl@2.1.1)
-
-  regl@2.1.1: {}
 
   resolve-from@4.0.0: {}
 

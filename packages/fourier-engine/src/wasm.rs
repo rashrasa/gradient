@@ -1,8 +1,7 @@
 // Contains WASM-compatible types/conversions
 // Mainly for separation of concerns
 
-use wasm_bindgen::{JsValue, prelude::wasm_bindgen};
-use web_sys::js_sys::{Object, Reflect};
+use wasm_bindgen::prelude::wasm_bindgen;
 
 #[wasm_bindgen]
 pub struct ComplexFloat {
@@ -31,7 +30,7 @@ pub enum ReadableState {
 #[wasm_bindgen]
 pub struct DigitalSignal {
     pub frequency: f32,
-    samples: Vec<JsValue>,
+    samples: Vec<f32>,
 }
 
 #[wasm_bindgen]
@@ -51,7 +50,7 @@ pub struct SignalLoadedAdditional {
 #[wasm_bindgen]
 impl DigitalSignal {
     #[wasm_bindgen]
-    pub fn samples(&self) -> Vec<JsValue> {
+    pub fn samples(&self) -> Vec<f32> {
         self.samples.clone()
     }
 }
@@ -116,16 +115,7 @@ impl From<&crate::core::DigitalSignal> for DigitalSignal {
     fn from(value: &crate::core::DigitalSignal) -> Self {
         Self {
             frequency: value.frequency(),
-            samples: value
-                .samples()
-                .iter()
-                .map(|s| {
-                    let obj = JsValue::from(Object::new());
-                    Reflect::set(&obj, &JsValue::from("x"), &JsValue::from(s.t)).unwrap();
-                    Reflect::set(&obj, &JsValue::from("y"), &JsValue::from(s.y)).unwrap();
-                    obj
-                })
-                .collect(),
+            samples: value.samples().to_vec(),
         }
     }
 }

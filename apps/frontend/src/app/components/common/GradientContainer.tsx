@@ -1,6 +1,6 @@
 "use client"
 
-import { HTMLAttributes } from "react";
+import { HTMLAttributes, } from "react";
 
 export interface Colour {
     r: number, g: number, b: number, a: number
@@ -27,10 +27,16 @@ const zClassScheme: {
 }
 
 interface GradientContainerProps extends HTMLAttributes<HTMLDivElement> {
-    z?: GradientZIndex, text?: string, border?: string, layout?: string, direction?: FlexDirection,
+    ref?: React.Ref<HTMLDivElement> | undefined,
+    z?: GradientZIndex,
+    text?: string,
+    border?: string,
+    layout?: string,
+    direction?: FlexDirection,
 }
 
 export default function GradientContainer({
+    ref,
     children,
     className,
     z = "-40",
@@ -43,6 +49,7 @@ export default function GradientContainer({
     const zClasses = zClassScheme[z];
     return (
         <div
+            ref={ref as any | undefined}
             className={`flex flex-${flexDirection} ${layout} ${zClasses} ${className ?? ""} ${text} ${border}`}
             {...props}
         >

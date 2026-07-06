@@ -8,14 +8,15 @@ impl Function {
     pub fn new(f: fn(f32) -> f32) -> Self {
         return Function { f };
     }
-    pub fn sample(&self, start: f32, end: f32, freq: f32) -> Vec<Point2F> {
+
+    pub fn sample(&self, start: f32, end: f32, freq: f32) -> Vec<f32> {
         let mut samples = vec![];
         let period = 1.0 / freq;
 
         let mut t = start;
         while t < end {
             let sample = (self.f)(t);
-            samples.push(Point2F { t, y: sample });
+            samples.push(sample);
             t += period;
         }
         samples
@@ -39,11 +40,11 @@ mod tests {
         let samples = Function::new(f).sample(start, end, freq);
 
         assert_eq!(samples.len(), 5);
-        assert_relative_eq!(samples[0].y, 1.0);
-        assert_relative_eq!(samples[1].y, 0.0);
-        assert_relative_eq!(samples[2].y, -1.0);
-        assert_relative_eq!(samples[3].y, 0.0);
-        assert_relative_eq!(samples[4].y, 1.0);
+        assert_relative_eq!(samples[0], 1.0);
+        assert_relative_eq!(samples[1], 0.0);
+        assert_relative_eq!(samples[2], -1.0);
+        assert_relative_eq!(samples[3], 0.0);
+        assert_relative_eq!(samples[4], 1.0);
     }
 
     #[test]
@@ -54,7 +55,7 @@ mod tests {
 
         let samples = Function::new(|t| t.sin()).sample(start, end, freq);
 
-        let sum: f32 = samples.iter().map(|s| s.y).sum();
+        let sum: f32 = samples.iter().sum();
         let avg = sum / samples.len() as f32;
 
         assert_relative_eq!(avg, 0.0, epsilon = 1.0e-4);

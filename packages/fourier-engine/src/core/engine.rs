@@ -160,20 +160,14 @@ impl FourierEngine {
         let mut y_min = f32::MAX;
         let mut y_max = f32::MIN;
 
-        let samples = samples
-            .iter()
-            .enumerate()
-            .map(|(i, s)| {
-                let t = i as f32 / frequency as f32;
-                let y = *s;
-                t_min = t_min.min(t);
-                t_max = t_max.max(t);
-                y_min = y_min.min(y);
-                y_max = y_max.max(y);
-
-                Point2F { t, y }
-            })
-            .collect();
+        for (i, s) in samples.iter().enumerate() {
+            let t = i as f32 / frequency as f32;
+            let y = *s;
+            t_min = t_min.min(t);
+            t_max = t_max.max(t);
+            y_min = y_min.min(y);
+            y_max = y_max.max(y);
+        }
 
         let signal = DigitalSignal::new(frequency as f32, samples);
         let fft_result = FFTResult::from_signal(&signal);

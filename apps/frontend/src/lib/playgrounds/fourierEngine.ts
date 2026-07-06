@@ -11,6 +11,7 @@ import {
     SignalLoadedAdditional,
     get_signal_additional
 } from 'fourier-engine'
+import WaveSurfer from 'wavesurfer.js';
 
 export { ReadableState };
 
@@ -24,25 +25,55 @@ export type FourierEngineRendererState = {
 
     sortedFData: FFTValue[],
     fData: FFTValue[],
-
-    originalAudioBuffer: AudioBufferSourceNode,
 }
 
 export class FourierEngineRenderer {
     private audioCtx: AudioContext | undefined;
-
     private state: FourierEngineRendererState;
 
-    constructor() {
+    private originalBuffer: AudioBuffer | undefined;
+
+    private outNode: AudioBufferSourceNode | undefined;
+
+    private wsContainer: string | HTMLElement;
+    private ws: WaveSurfer | undefined;
+
+    constructor(wsContainer: string | HTMLElement) {
+        this.wsContainer = wsContainer;
         this.state = { inner: ReadableState.Ready }
-        this.resolveState();
     }
 
-    public setAudioClip(data: Uint8Array) {
+    public async setAudioClip(file: File) {
         unload()
         this.audioCtx = new AudioContext();
-        load_audio_data(data);
-        this.resolveState();
+        load_audio_data(new Uint8Array(await file.arrayBuffer()));
+        let sortedFData = get_sorted_fft_result()!;
+        let decodedSignal = get_signal()!;
+        let additional = get_signal_additional()!;
+        let fData = get_fft_result()!;
+
+        let samples = decodedSignal.samples();
+
+        this.originalBuffer = this.createBufferMono(samples as Float32Array<ArrayBuffer>, decodedSignal.frequency);
+
+        this.ws = WaveSurfer.create({
+            container: this.wsContainer,
+            width: "100%",
+            height: 600,
+            waveColor: 'rgb(200, 0, 200)',
+            progressColor: 'rgb(100, 0, 100)',
+            url: URL.createObjectURL(file),
+        });
+        this.ws.on("interaction", () => this.ws!.play());
+
+        this.state = {
+            inner: ReadableState.SignalLoaded,
+            sortedFData: sortedFData,
+            decodedSignal: decodedSignal,
+            additional: additional,
+            fData: fData,
+        };
+
     }
 
     public getSortedSignal(): FFTValue[] {
@@ -53,56 +84,14 @@ export class FourierEngineRenderer {
                 return this.state.sortedFData!
         }
     }
-
-    private resolveState() {
-        switch (get_state()) {
-            case ReadableState.Ready:
-                this.state = { inner: ReadableState.Ready }
-                break;
-            case ReadableState.SignalLoaded:
-                this.audioCtx = new AudioContext();
-                let sortedFData = get_sorted_fft_result()!;
-                let decodedSignal = get_signal()!;
-                let additional = get_signal_additional()!;
-                let fData = get_fft_result()!;
-                let originalAudioBuffer = new AudioBuffer({
-                    length: decodedSignal.samples().length,
-                    sampleRate: decodedSignal.frequency,
-                    numberOfChannels: 1,
-                });
-
-                let sampleBuffer = new Float32Array(new ArrayBuffer(4 * decodedSignal.samples().length))
-                sampleBuffer.set(decodedSignal.samples().map(s => s.y), 0)
-
-                originalAudioBuffer.copyToChannel(sampleBuffer, 0);
-
-                let originalBufferSource = this.audioCtx!.createBufferSource()
-                originalBufferSource.buffer = originalAudioBuffer;
-                originalBufferSource.connect(this.audioCtx!.destination);
-                originalBufferSource.start();
-                this.audioCtx!.resume()
-
-
-                this.state = {
-                    inner: ReadableState.SignalLoaded,
-                    sortedFData: sortedFData,
-                    decodedSignal: decodedSignal,
-                    additional: additional,
-                    fData: fData,
-                    originalAudioBuffer: originalBufferSource,
-                };
-                break;
-
+    public playOriginal() {
+        if (this.state.inner == ReadableState.SignalLoaded) {
+            this.ws!.play(0)
         }
     }
 
-    public playOriginal() {
-        if (this.state.inner == ReadableState.SignalLoaded) {
-            if (this.audioCtx!.state == "suspended") {
-                this.audioCtx!.resume()
-            }
-        }
-
+    public stop() {
+        this.ws?.stop()
     }
 
     public getState(): FourierEngineRendererState {
@@ -111,10 +100,26 @@ export class FourierEngineRenderer {
 
     public unloadAudioClip() {
         unload()
-        this.resolveState();
+        this.ws!.destroy();
+        this.ws = undefined;
+        this.state = { inner: ReadableState.Ready };
     }
 
     public dispose() {
-        this.resolveState();
+        this.state = { inner: ReadableState.Ready };
+    }
+
+    private playBuffer(buffer: AudioBuffer) {
+        this.outNode?.stop();
+        this.outNode = this.audioCtx!.createBufferSource();
+        this.outNode.connect(this.audioCtx!.destination)
+        this.outNode.buffer = buffer;
+        this.outNode.start();
+    }
+
+    private createBufferMono(data: Float32Array<ArrayBuffer>, sampleRate: number): AudioBuffer {
+        const buffer = this.audioCtx!.createBuffer(1, data.length, sampleRate);
+        buffer.copyToChannel(data, 0);
+        return buffer;
     }
 }

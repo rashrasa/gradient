@@ -2,6 +2,12 @@
 
 An online learning platform for math, science, and engineering with collaborative demos.
 
+## Demos
+
+### Fourier Transform
+
+https://github.com/user-attachments/assets/3fc98ed4-b295-4f85-bc88-089534c0a463
+
 ## Development
 
 ### Docker Development

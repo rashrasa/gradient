@@ -34,6 +34,14 @@ pub struct DigitalSignal {
 }
 
 #[wasm_bindgen]
+impl DigitalSignal {
+    #[wasm_bindgen]
+    pub fn samples(&self) -> Vec<f32> {
+        self.samples.clone()
+    }
+}
+
+#[wasm_bindgen]
 #[derive(Clone, Copy)]
 pub struct Point2F {
     pub t: f32,
@@ -41,17 +49,36 @@ pub struct Point2F {
 }
 
 #[wasm_bindgen]
-#[derive(Clone, Copy)]
 pub struct SignalLoadedAdditional {
     pub original_signal_domain: Point2F,
     pub original_signal_range: Point2F,
 }
 
 #[wasm_bindgen]
-impl DigitalSignal {
+pub struct PlayablePartial {
+    freqs: Vec<usize>,
+    wav: Vec<u8>,
+}
+
+#[wasm_bindgen]
+impl PlayablePartial {
     #[wasm_bindgen]
-    pub fn samples(&self) -> Vec<f32> {
-        self.samples.clone()
+    pub fn wav(&self) -> Vec<u8> {
+        self.wav.clone()
+    }
+
+    #[wasm_bindgen]
+    pub fn freqs(&self) -> Vec<usize> {
+        self.freqs.clone()
+    }
+}
+
+impl From<&crate::core::PlayablePartial> for PlayablePartial {
+    fn from(value: &crate::core::PlayablePartial) -> Self {
+        Self {
+            freqs: value.freqs.clone(),
+            wav: value.wav.clone(),
+        }
     }
 }
 

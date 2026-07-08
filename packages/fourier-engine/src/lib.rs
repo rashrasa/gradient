@@ -2,6 +2,7 @@ pub mod core;
 
 #[cfg(not(target_arch = "wasm32"))]
 pub use core::*;
+
 #[cfg(target_arch = "wasm32")]
 use {anyhow::Context, core::FourierEngine, std::cell::RefCell, wasm::*, wasm_bindgen::prelude::*};
 
@@ -87,4 +88,19 @@ pub fn get_fft_result() -> Option<Vec<FFTValue>> {
 pub fn get_wav_original() -> Option<Vec<u8>> {
     console_error_panic_hook::set_once();
     ENGINE.with_borrow(|v| v.try_loaded().map(|a| a.playable.original_wav.clone()))
+}
+
+#[cfg(target_arch = "wasm32")]
+#[wasm_bindgen]
+pub fn get_wavs_partial() -> Option<Vec<crate::wasm::PlayablePartial>> {
+    console_error_panic_hook::set_once();
+    ENGINE.with_borrow(|v| {
+        v.try_loaded().map(|a| {
+            a.playable
+                .partial_playable
+                .iter()
+                .map(|v| v.into())
+                .collect()
+        })
+    })
 }

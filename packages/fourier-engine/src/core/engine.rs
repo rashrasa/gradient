@@ -1,12 +1,11 @@
 use std::io::Cursor;
 
+use crate::core::{DigitalSignal, FFTResult};
 use anyhow::Context;
 use symphonia::core::{
     formats::{TrackType, probe::Hint},
     io::{MediaSourceStream, ReadOnlySource},
 };
-
-use crate::core::{DigitalSignal, FFTResult};
 
 #[derive(Debug, Clone, Copy)]
 pub struct SignalLoadedAdditional {
@@ -33,12 +32,12 @@ pub struct SignalLoaded {
 pub struct Playable {
     pub original_wav: Vec<u8>,
 
-    pub partial_frequency_counts: Vec<PlayablePartial>,
+    pub partial_playable: Vec<PlayablePartial>,
 }
 
 #[derive(Debug, Clone)]
 pub struct PlayablePartial {
-    pub n_freqs: usize,
+    pub freqs: Vec<usize>,
     pub wav: Vec<u8>,
 }
 
@@ -160,7 +159,7 @@ impl FourierEngine {
 
         let playable = Playable {
             original_wav,
-            partial_frequency_counts: vec![],
+            partial_playable: vec![],
         };
 
         self.state = State::SignalLoaded(SignalLoaded {

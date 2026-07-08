@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { FourierEngineRenderer, FourierEngineRendererState } from "@/lib/playgrounds/fourierEngine";
 import { ReadableState } from "fourier-engine";
 import { record } from "@/lib/debug/profile";
+import AudioControls from "./components/AudioControls";
 
 let renderer: FourierEngineRenderer | undefined;
 
@@ -65,9 +66,9 @@ export default function FourierPlayground() {
                     className="hidden"
                 />
                 {(rendererState.inner == ReadableState.SignalLoaded) ?
-                    (
-                        <><button
-                            className="hover:cursor-pointer border border-sky-600 bg-white p-2 rounded-lg"
+                    (<>
+                        <button
+                            className="hover:cursor-pointer border border-sky-600 bg-white p-2 rounded-lg mb-4"
                             onClick={
                                 (_) => {
                                     let stop = record("Unloading audio")
@@ -78,22 +79,19 @@ export default function FourierPlayground() {
                                 }
                             }
                         >Clear Audio</button>
-                            <button
-                                className="hover:cursor-pointer border border-sky-600 bg-white p-2 rounded-lg"
-                                onClick={
-                                    (_) => {
-                                        renderer!.playOriginal();
-                                    }
-                                }
-                            >Play Original Audio</button>
-                            <button
-                                className="hover:cursor-pointer border border-sky-600 bg-white p-2 rounded-lg"
-                                onClick={
-                                    (_) => {
-                                        renderer!.stop();
-                                    }
-                                }
-                            >Stop</button></>)
+                        <AudioControls
+                            playPause={() => renderer!.playPauseOriginal()}
+                            stop={() => renderer!.stopOriginal()}
+                            label={"Original"}
+                        />
+                        {renderer!.partialSignals()!.forEach((sig) =>
+                            <AudioControls
+                                playPause={() => sig.playPause()}
+                                stop={() => sig.stop()}
+                                label={`Top ${sig.frequencies.length} frequencies`}
+                            />
+                        )}
+                    </>)
                     : <></>}
 
             </GradientContainer>

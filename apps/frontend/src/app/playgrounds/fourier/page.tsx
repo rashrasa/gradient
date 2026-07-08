@@ -31,7 +31,7 @@ export default function FourierPlayground() {
             <GradientContainer
                 ref={waveformRef}
                 id="waveform"
-                className="flex flex-30 border-4 min-h-160 border-black rounded-4xl bg-white space-y-8"
+                className="flex flex-30 border-4 min-h-160 border-black rounded-4xl bg-white space-y-8 py-8"
             >
             </GradientContainer>
             <GradientContainer

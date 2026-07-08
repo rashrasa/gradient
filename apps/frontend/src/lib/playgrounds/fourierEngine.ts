@@ -104,7 +104,7 @@ function waveSurferFromBytes(container: string | HTMLElement, bytes: Uint8Array<
     const ws = WaveSurfer.create({
         container: container,
         width: "100%",
-        height: 100,
+        height: 50,
         waveColor: 'rgb(200, 0, 200)',
         progressColor: 'rgb(100, 0, 100)',
         url: url,

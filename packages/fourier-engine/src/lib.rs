@@ -5,14 +5,16 @@ pub enum StartListSelection {
 use StartListSelection::Indexes;
 use StartListSelection::Proportion;
 
-pub const GENERATE_TOP_F: [StartListSelection; 8] = [
+pub const GENERATE_TOP_F: [StartListSelection; 10] = [
     Indexes(1),
     Indexes(5),
     Indexes(50),
     Indexes(100),
-    Proportion(0.25),
+    Indexes(250),
+    Indexes(1000),
+    Indexes(2500),
+    Indexes(5000),
     Proportion(0.50),
-    Proportion(0.80),
     Proportion(1.0),
 ];
 

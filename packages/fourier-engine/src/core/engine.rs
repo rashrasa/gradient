@@ -173,8 +173,8 @@ impl FourierEngine {
 
             let mut items = 0;
             for (index_to_find, x) in original_fft.sorted_values().take(n).enumerate() {
-                // we must search the entire original index container for i
-                // to get the original bin number
+                // we must search the entire original index container for
+                // the original bin number
 
                 let mut original_index = None;
                 for (position, index_to_match) in original_fft.sorted_original_indices().enumerate()

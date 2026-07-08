@@ -8,7 +8,7 @@ use std::cmp::Ordering;
 /// the original ordering while storing the list in
 /// sorted order.
 ///
-/// It's less efficient to access the original ordering
+/// It's slightly less efficient to access the original ordering
 /// due to the need to index into arbitrary parts of the array
 /// which isn't optimal for cache locality.
 /// It's assumed that the sorted order is needed most frequently.
@@ -26,7 +26,7 @@ impl<T> MaxVec<T> {
     where
         F: FnMut(&T, &T) -> Ordering,
     {
-        let mut enumerated: Vec<(usize, T)> = data.into_iter().enumerate().collect();
+        let mut enumerated: Vec<_> = data.into_iter().enumerate().collect();
         enumerated.sort_by(|(_, a), (_, b)| sort_by(a, b));
 
         let n = enumerated.len();
@@ -49,11 +49,23 @@ impl<T> MaxVec<T> {
         }
     }
 
+    pub fn original_indices<'a>(&'a self) -> std::slice::Iter<'a, usize> {
+        self.original.iter()
+    }
+
     pub fn sorted(&self) -> Sorted<'_, T> {
         Sorted {
             inner: self.sorted.iter(),
             length: self.sorted.len(),
         }
+    }
+
+    pub fn len(&self) -> usize {
+        self.sorted.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
     }
 }
 
@@ -110,8 +122,8 @@ mod tests {
 
     #[test]
     fn iterators_yield_expected_values() {
-        let sort_by: fn(&i32, &i32) -> Ordering = |a, b| a.cmp(b);
-        let source = vec![1, 574, 7, 13, 8, -423];
+        let sort_by = i32::cmp;
+        let source = vec![1, 574, 7, 13, 8, -423, 99999, -239423949];
         let mut sorted = source.clone();
         sorted.sort_by(sort_by);
 

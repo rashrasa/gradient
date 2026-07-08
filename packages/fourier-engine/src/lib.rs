@@ -1,3 +1,21 @@
+pub enum StartListSelection {
+    Indexes(usize),
+    Proportion(f64),
+}
+use StartListSelection::Indexes;
+use StartListSelection::Proportion;
+
+pub const GENERATE_TOP_F: [StartListSelection; 8] = [
+    Indexes(1),
+    Indexes(5),
+    Indexes(50),
+    Indexes(100),
+    Proportion(0.25),
+    Proportion(0.50),
+    Proportion(0.80),
+    Proportion(1.0),
+];
+
 pub mod core;
 
 #[cfg(not(target_arch = "wasm32"))]

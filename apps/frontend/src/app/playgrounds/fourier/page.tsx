@@ -14,17 +14,13 @@ export default function FourierPlayground() {
     let finishPageCompute = record("Computing page")
     useEffect(() => {
         renderer = new FourierEngineRenderer(waveformRef.current!);
-        window.addEventListener("resize", (_) => { onResize() });
         return () => {
             renderer?.dispose()
-            window.removeEventListener("resize", (_) => { onResize() })
         }
     }, [])
     const uploadAudioRef = useRef<HTMLInputElement>(null);
     const [loadedFile, setLoadedFile] = useState<string | null>(null);
-    const [height, setHeight] = useState(600);
     const [rendererState, setRendererState] = useState<FourierEngineRendererState>({ inner: ReadableState.Ready });
-    const onResize = () => setHeight(window.innerHeight * 0.8)
 
     finishPageCompute();
     return (
@@ -35,8 +31,7 @@ export default function FourierPlayground() {
             <GradientContainer
                 ref={waveformRef}
                 id="waveform"
-                className="flex h-160 flex-30 border-4 z-100 border-black rounded-4xl bg-white"
-                style={{ height: height }}
+                className="flex flex-30 border-4 min-h-160 border-black rounded-4xl bg-white space-y-8"
             >
             </GradientContainer>
             <GradientContainer
@@ -84,8 +79,9 @@ export default function FourierPlayground() {
                             stop={() => renderer!.stopOriginal()}
                             label={"Original"}
                         />
-                        {renderer!.partialSignals()!.forEach((sig) =>
+                        {renderer!.partialSignals()!.map((sig, i) =>
                             <AudioControls
+                                key={i}
                                 playPause={() => sig.playPause()}
                                 stop={() => sig.stop()}
                                 label={`Top ${sig.frequencies.length} frequencies`}

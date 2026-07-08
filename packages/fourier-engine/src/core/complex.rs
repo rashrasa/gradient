@@ -11,6 +11,8 @@ pub struct ComplexFloat {
 }
 
 impl ComplexFloat {
+    pub const ZERO: Self = Self { r: 0.0, theta: 0.0 };
+
     pub fn standard(a: f32, b: f32) -> Self {
         ComplexFloat {
             r: (a * a + b * b).sqrt(),

@@ -1,17 +1,14 @@
 use std::io::Cursor;
 
-use crate::core::{DigitalSignal, FFTResult};
+use crate::{
+    StartListSelection,
+    core::{ComplexFloat, DigitalSignal, FFTResult},
+};
 use anyhow::Context;
 use symphonia::core::{
     formats::{TrackType, probe::Hint},
     io::{MediaSourceStream, ReadOnlySource},
 };
-
-#[derive(Debug, Clone, Copy)]
-pub struct SignalLoadedAdditional {
-    pub original_signal_domain: [f32; 2],
-    pub original_signal_range: [f32; 2],
-}
 
 #[derive(Debug, Clone, Default)]
 pub enum State {
@@ -37,7 +34,7 @@ pub struct Playable {
 
 #[derive(Debug, Clone)]
 pub struct PlayablePartial {
-    pub freqs: Vec<usize>,
+    pub freqs: Vec<f32>,
     pub wav: Vec<u8>,
 }
 
@@ -152,19 +149,74 @@ impl FourierEngine {
             samples.push(sample / n_sets as f32);
         }
 
-        let signal = DigitalSignal::new(frequency, samples);
-        let fft = FFTResult::from_signal(&signal);
+        let original_signal = DigitalSignal::new(frequency, samples);
+        let original_fft = FFTResult::from_signal(&original_signal);
 
-        let original_wav = samples_to_wav_bytes(signal.samples().to_vec(), signal.frequency(), 1)?;
+        let original_wav = samples_to_wav_bytes(
+            original_signal.samples().to_vec(),
+            original_signal.frequency(),
+            1,
+        )?;
+
+        let mut partial_playable = vec![];
+        let fft_len = original_fft.len();
+        for (i, f) in crate::GENERATE_TOP_F.iter().enumerate() {
+            let n = match f {
+                StartListSelection::Indexes(n) => *n,
+                StartListSelection::Proportion(f) => (fft_len as f64 * f) as usize,
+            };
+            let n = n.min(fft_len);
+
+            let mut partial_fft: Vec<ComplexFloat> =
+                (0..fft_len).map(|_| ComplexFloat::ZERO).collect();
+            let mut frequencies_partial = Vec::with_capacity(n);
+
+            let mut items = 0;
+            for (index_to_find, x) in original_fft.sorted_values().take(n).enumerate() {
+                // we must search the entire original index container for i
+                // to get the original bin number
+
+                let mut original_index = None;
+                for (position, index_to_match) in original_fft.sorted_original_indices().enumerate()
+                {
+                    if *index_to_match == index_to_find {
+                        original_index = Some(position);
+                        break;
+                    }
+                }
+                let original_index = original_index.unwrap();
+
+                partial_fft[original_index] = x.result();
+                frequencies_partial.push(x.frequency());
+                items += 1;
+            }
+            assert!(items == n, "expected {n} items, got {items}");
+
+            let partial_signal = DigitalSignal::from_fft(
+                &partial_fft,
+                original_signal.frequency(),
+                original_signal.samples().len(),
+            );
+            let wav = samples_to_wav_bytes(
+                partial_signal.samples().to_vec(),
+                partial_signal.frequency(),
+                1,
+            )?;
+
+            partial_playable.push(PlayablePartial {
+                freqs: frequencies_partial,
+                wav,
+            });
+        }
 
         let playable = Playable {
             original_wav,
-            partial_playable: vec![],
+            partial_playable,
         };
 
         self.state = State::SignalLoaded(SignalLoaded {
-            signal,
-            fft,
+            signal: original_signal,
+            fft: original_fft,
             playable,
         });
         Ok(())

@@ -1,4 +1,4 @@
-use crate::core::{ComplexFloat, DigitalSignal, MaxVec, Original, Sorted};
+use crate::core::{ComplexFloat, MaxVec, Original, Sorted};
 use std::f32::consts::PI;
 
 #[derive(Clone, Copy, Debug)]
@@ -46,10 +46,9 @@ impl FFTResult {
         if !samples.len().is_power_of_two() {
             samples.resize(
                 original_sample_count.next_power_of_two(),
-                ComplexFloat::polar(0.0, 0.0),
+                ComplexFloat::ZERO,
             );
         }
-        let padded_sample_count = samples.len();
 
         let fft = fft_recursive(&samples);
 
@@ -64,12 +63,8 @@ impl FFTResult {
             .collect();
 
         let values = MaxVec::new(values, |a, b| b.result.r().total_cmp(&a.result.r()));
-
-        let reconstructed = inverse_fft(&fft, padded_sample_count)
-            .iter()
-            .map(|v| v.a())
-            .take(original_sample_count)
-            .collect();
+        let reconstructed =
+            DigitalSignal::from_fft(&fft, sampling_frequency, samples.len()).samples;
 
         FFTResult {
             original_frequency: signal.frequency(),
@@ -81,23 +76,63 @@ impl FFTResult {
     pub fn original_frequency(&self) -> u32 {
         self.original_frequency
     }
-
     pub fn original_sample_count(&self) -> usize {
         self.original_sample_count
     }
     pub fn unsorted_values(&self) -> Original<'_, FFTValue> {
         self.values.original()
     }
-
     pub fn sorted_values(&self) -> Sorted<'_, FFTValue> {
         self.values.sorted()
     }
-
+    pub fn sorted_original_indices<'a>(&'a self) -> std::slice::Iter<'a, usize> {
+        self.values.original_indices()
+    }
     pub fn reconstructed(&self) -> &[f32] {
         &self.reconstructed
     }
+    pub fn len(&self) -> usize {
+        self.values.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.values.is_empty()
+    }
 }
 
+#[derive(Debug, Clone)]
+pub struct DigitalSignal {
+    samples: Vec<f32>,
+    frequency: u32,
+}
+impl DigitalSignal {
+    pub fn new(frequency: u32, samples: Vec<f32>) -> Self {
+        DigitalSignal { frequency, samples }
+    }
+
+    pub fn from_fft(fft: &[ComplexFloat], frequency: u32, n_samples: usize) -> Self {
+        let samples = inverse_fft(fft, n_samples)
+            .iter()
+            .map(|v| v.a())
+            .take(n_samples)
+            .collect();
+
+        Self { samples, frequency }
+    }
+
+    pub fn samples(&self) -> &[f32] {
+        &self.samples
+    }
+
+    pub fn frequency(&self) -> u32 {
+        self.frequency
+    }
+}
+#[derive(Debug, Clone, Copy)]
+pub struct Point2F {
+    pub t: f32,
+    pub y: f32,
+}
 fn fft_recursive(samples: &[ComplexFloat]) -> Vec<ComplexFloat> {
     assert!(samples.len().is_power_of_two());
     let n = samples.len();
@@ -106,8 +141,8 @@ fn fft_recursive(samples: &[ComplexFloat]) -> Vec<ComplexFloat> {
     }
 
     let m = n / 2;
-    let mut even_t = vec![ComplexFloat::standard(0.0, 0.0); m];
-    let mut odd_t = vec![ComplexFloat::standard(0.0, 0.0); m];
+    let mut even_t = vec![ComplexFloat::ZERO; m];
+    let mut odd_t = vec![ComplexFloat::ZERO; m];
     for i in 0..m {
         even_t[i] = samples[2 * i];
         odd_t[i] = samples[2 * i + 1];
@@ -116,7 +151,7 @@ fn fft_recursive(samples: &[ComplexFloat]) -> Vec<ComplexFloat> {
     let even_f = fft_recursive(&even_t);
     let odd_f = fft_recursive(&odd_t);
 
-    let mut bins = vec![ComplexFloat::standard(0.0, 0.0); n];
+    let mut bins = vec![ComplexFloat::ZERO; n];
 
     for k in 0..n / 2 {
         let c_k: ComplexFloat =
@@ -128,9 +163,33 @@ fn fft_recursive(samples: &[ComplexFloat]) -> Vec<ComplexFloat> {
     bins
 }
 
-fn inverse_fft(values: &[ComplexFloat], sample_count: usize) -> Vec<ComplexFloat> {
+fn inverse_fft(values: &[ComplexFloat], requested_sample_count: usize) -> Vec<ComplexFloat> {
+    let len = values.len();
+    assert!(
+        requested_sample_count <= isize::MAX as usize,
+        "sample count exceeds max value {}",
+        isize::MAX
+    );
+
+    let padding_needed = if requested_sample_count > len {
+        if requested_sample_count.is_power_of_two() {
+            requested_sample_count - len
+        } else {
+            requested_sample_count.next_power_of_two() - len
+        }
+    } else {
+        if len.is_power_of_two() {
+            0
+        } else {
+            len.next_power_of_two() - len
+        }
+    };
+
+    let padding: Vec<_> = (0..padding_needed).map(|_| ComplexFloat::ZERO).collect();
+
     let conjugate_values: Vec<ComplexFloat> = values
         .iter()
+        .chain(padding.iter())
         .map(|v| {
             // Calculate Conjugate
             ComplexFloat::standard(v.a(), -v.b())
@@ -139,7 +198,8 @@ fn inverse_fft(values: &[ComplexFloat], sample_count: usize) -> Vec<ComplexFloat
 
     let result: Vec<ComplexFloat> = fft_recursive(&conjugate_values)
         .iter()
-        .map(|v| ComplexFloat::standard(v.a(), -v.b()) / sample_count as f32)
+        .map(|v| ComplexFloat::standard(v.a(), -v.b()) / requested_sample_count as f32)
+        .take(requested_sample_count)
         .collect();
 
     result

@@ -56,7 +56,7 @@ pub struct SignalLoadedAdditional {
 
 #[wasm_bindgen]
 pub struct PlayablePartial {
-    freqs: Vec<usize>,
+    freqs: Vec<f32>,
     wav: Vec<u8>,
 }
 
@@ -68,7 +68,7 @@ impl PlayablePartial {
     }
 
     #[wasm_bindgen]
-    pub fn freqs(&self) -> Vec<usize> {
+    pub fn freqs(&self) -> Vec<f32> {
         self.freqs.clone()
     }
 }
@@ -152,15 +152,6 @@ impl From<&[f32; 2]> for Point2F {
         Self {
             t: value[0],
             y: value[1],
-        }
-    }
-}
-
-impl From<&crate::core::SignalLoadedAdditional> for SignalLoadedAdditional {
-    fn from(value: &crate::core::SignalLoadedAdditional) -> Self {
-        Self {
-            original_signal_domain: (&value.original_signal_domain).into(),
-            original_signal_range: (&value.original_signal_range).into(),
         }
     }
 }
